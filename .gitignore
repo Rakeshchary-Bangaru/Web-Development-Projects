@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Node.js / React / Vite
+node_modules/
+dist/
+dist-ssr/
+.vite/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
