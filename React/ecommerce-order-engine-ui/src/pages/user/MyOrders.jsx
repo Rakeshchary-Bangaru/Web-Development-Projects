@@ -31,8 +31,7 @@ function MyOrders() {
     setSearched(false);
 
 
-    const id =
-      Number(customerId);
+    const id = Number(customerId);
 
 
     if (
@@ -51,7 +50,6 @@ function MyOrders() {
     try {
 
       setLoading(true);
-
 
       const allOrders =
         await getOrders();
@@ -101,10 +99,24 @@ function MyOrders() {
 
     <div>
 
-      <h1>My Orders</h1>
+      <div className="orders-header">
+
+        <h1>
+          My Orders
+        </h1>
+
+        <p>
+          View your previous purchases,
+          payment details and order status.
+        </p>
+
+      </div>
 
 
-      <form onSubmit={handleSearch}>
+      <form
+        className="orders-search-form"
+        onSubmit={handleSearch}
+      >
 
         <div>
 
@@ -121,6 +133,7 @@ function MyOrders() {
                 event.target.value
               )
             }
+            placeholder="Enter your customer ID"
             required
           />
 
@@ -128,6 +141,7 @@ function MyOrders() {
 
 
         <button
+          className="primary-button"
           type="submit"
           disabled={loading}
         >
@@ -142,126 +156,199 @@ function MyOrders() {
 
 
       {error && (
-        <p>{error}</p>
+
+        <div className="error-message">
+          {error}
+        </div>
+
       )}
 
 
       {searched &&
         orders.length === 0 && (
 
-          <p>
-            No orders found for this customer.
-          </p>
+          <div className="no-orders">
+
+            <div className="no-orders-icon">
+              📦
+            </div>
+
+            <h2>
+              No Orders Found
+            </h2>
+
+            <p>
+              We couldn't find any orders
+              for this customer.
+            </p>
+
+          </div>
 
         )}
 
 
       {orders.length > 0 && (
 
-        <div>
-
-          <h2>Order History</h2>
-
+        <div className="orders-list">
 
           {orders.map((order) => (
 
-            <div key={order.id}>
+            <div
+              className="order-card"
+              key={order.id}
+            >
 
-              <h3>
-                Order #{order.id}
-              </h3>
+              <div className="order-card-header">
 
+                <div>
 
-              <p>
-                Customer:{" "}
-                {order.customerName}
-              </p>
+                  <p className="order-label">
+                    ORDER
+                  </p>
 
+                  <h2>
+                    #{order.id}
+                  </h2>
 
-              <p>
-                Payment:{" "}
-                {order.paymentType}
-              </p>
-
-
-              <p>
-                Status:{" "}
-                {order.status}
-              </p>
+                </div>
 
 
-              <p>
-                Date:{" "}
-                {formatDate(
-                  order.createdAt
-                )}
-              </p>
+                <span
+                  className={
+                    order.status === "PAID"
+                      ? "order-status paid-order-status"
+                      : "order-status"
+                  }
+                >
+
+                  <span className="status-dot"></span>
+
+                  {order.status}
+
+                </span>
+
+              </div>
 
 
-              <p>
-                Total: ₹{order.total}
-              </p>
+              <div className="order-details-grid">
+
+                <div>
+
+                  <span>
+                    Customer
+                  </span>
+
+                  <strong>
+                    {order.customerName}
+                  </strong>
+
+                </div>
 
 
-              <h4>Items</h4>
+                <div>
+
+                  <span>
+                    Payment
+                  </span>
+
+                  <strong>
+                    {order.paymentType}
+                  </strong>
+
+                </div>
 
 
-              <table>
+                <div>
 
-                <thead>
+                  <span>
+                    Date
+                  </span>
 
-                  <tr>
+                  <strong>
+                    {formatDate(
+                      order.createdAt
+                    )}
+                  </strong>
 
-                    <th>
-                      Product
-                    </th>
-
-                    <th>
-                      Quantity
-                    </th>
-
-                    <th>
-                      Subtotal
-                    </th>
-
-                  </tr>
-
-                </thead>
+                </div>
 
 
-                <tbody>
+                <div>
 
-                  {order.items.map(
-                    (item) => (
+                  <span>
+                    Total
+                  </span>
 
-                      <tr
-                        key={
-                          item.productId
-                        }
-                      >
+                  <strong className="order-total">
+                    ₹{order.total}
+                  </strong>
 
-                        <td>
-                          {item.productName}
-                        </td>
+                </div>
 
-                        <td>
-                          {item.quantity}
-                        </td>
+              </div>
 
-                        <td>
-                          ₹{item.subtotal}
-                        </td>
 
-                      </tr>
+              <div className="order-items-section">
 
-                    )
-                  )}
+                <h3>
+                  Order Items
+                </h3>
 
-                </tbody>
 
-              </table>
+                <table>
 
-              <hr />
+                  <thead>
+
+                    <tr>
+
+                      <th>
+                        Product
+                      </th>
+
+                      <th>
+                        Quantity
+                      </th>
+
+                      <th>
+                        Subtotal
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+
+                  <tbody>
+
+                    {order.items.map(
+                      (item) => (
+
+                        <tr
+                          key={item.productId}
+                        >
+
+                          <td>
+                            {item.productName}
+                          </td>
+
+                          <td>
+                            {item.quantity}
+                          </td>
+
+                          <td>
+                            ₹{item.subtotal}
+                          </td>
+
+                        </tr>
+
+                      )
+                    )}
+
+                  </tbody>
+
+                </table>
+
+              </div>
 
             </div>
 

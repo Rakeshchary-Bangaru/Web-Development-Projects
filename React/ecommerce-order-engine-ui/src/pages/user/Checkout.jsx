@@ -80,8 +80,6 @@ function Checkout() {
 
     const checkoutRequest = {
 
-      // Existing backend requires orderId.
-      // Date.now() gives us a positive long value.
       orderId: Date.now(),
 
       customerId: id,
@@ -91,8 +89,7 @@ function Checkout() {
       items: cartItems.map(
         (item) => ({
           productId: item.id,
-          quantity:
-            item.cartQuantity,
+          quantity: item.cartQuantity,
         })
       ),
     };
@@ -102,15 +99,12 @@ function Checkout() {
 
       setLoading(true);
 
-
       const order =
         await checkout(
           checkoutRequest
         );
 
-
       setCompletedOrder(order);
-
 
       clearCart();
 
@@ -130,48 +124,82 @@ function Checkout() {
 
     return (
 
-      <div>
+      <div className="checkout-success">
+
+        <div className="success-icon">
+          ✓
+        </div>
 
         <h1>
           Order Placed Successfully
         </h1>
 
-
         <p>
-          Order ID:{" "}
-          {completedOrder.id}
+          Your order has been created
+          successfully.
         </p>
 
 
-        <p>
-          Customer:{" "}
-          {completedOrder.customerName}
-        </p>
+        <div className="success-order-card">
+
+          <div>
+            <span>Order ID</span>
+            <strong>
+              {completedOrder.id}
+            </strong>
+          </div>
+
+          <div>
+            <span>Customer</span>
+            <strong>
+              {completedOrder.customerName}
+            </strong>
+          </div>
+
+          <div>
+            <span>Payment</span>
+            <strong>
+              {completedOrder.paymentType}
+            </strong>
+          </div>
+
+          <div>
+            <span>Status</span>
+            <strong className="paid-status">
+              {completedOrder.status}
+            </strong>
+          </div>
+
+          <div>
+            <span>Total</span>
+            <strong>
+              ₹{completedOrder.total}
+            </strong>
+          </div>
+
+        </div>
 
 
-        <p>
-          Payment:{" "}
-          {completedOrder.paymentType}
-        </p>
+        <div className="success-actions">
+
+          <Link to="/shop/orders">
+
+            <button className="primary-button">
+              View My Orders
+            </button>
+
+          </Link>
 
 
-        <p>
-          Status:{" "}
-          {completedOrder.status}
-        </p>
+          <Link to="/shop/products">
 
+            <button className="secondary-button">
+              Continue Shopping
+            </button>
 
-        <p>
-          Total: ₹
-          {completedOrder.total}
-        </p>
+          </Link>
 
-
-        <Link to="/shop/orders">
-
-          View My Orders
-
-        </Link>
+        </div>
 
       </div>
     );
@@ -182,16 +210,27 @@ function Checkout() {
 
     return (
 
-      <div>
+      <div className="empty-cart">
 
-        <h1>Checkout</h1>
+        <div className="empty-cart-icon">
+          🛒
+        </div>
+
+        <h1>
+          Your Cart is Empty
+        </h1>
 
         <p>
-          Your cart is empty.
+          Add products before proceeding
+          to checkout.
         </p>
 
         <Link to="/shop/products">
-          Continue Shopping
+
+          <button className="primary-button">
+            Browse Products
+          </button>
+
         </Link>
 
       </div>
@@ -203,158 +242,214 @@ function Checkout() {
 
     <div>
 
-      <h1>Checkout</h1>
+      <div className="checkout-header">
+
+        <h1>
+          Checkout
+        </h1>
+
+        <p>
+          Review your order and complete
+          your purchase.
+        </p>
+
+      </div>
 
 
-      <h2>Order Summary</h2>
+      <div className="checkout-layout">
+
+        <div className="checkout-form-section">
+
+          <h2>
+            Customer Details
+          </h2>
 
 
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>Product</th>
-
-            <th>Price</th>
-
-            <th>Quantity</th>
-
-            <th>Subtotal</th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody>
-
-          {cartItems.map(
-            (item) => (
-
-              <tr key={item.id}>
-
-                <td>
-                  {item.name}
-                </td>
-
-                <td>
-                  ₹{item.price}
-                </td>
-
-                <td>
-                  {item.cartQuantity}
-                </td>
-
-                <td>
-
-                  ₹{
-                    item.price *
-                    item.cartQuantity
-                  }
-
-                </td>
-
-              </tr>
-
-            )
-          )}
-
-        </tbody>
-
-      </table>
-
-
-      <h2>
-        Total: ₹{total}
-      </h2>
-
-
-      <h2>
-        Customer Details
-      </h2>
-
-
-      <form
-        onSubmit={handleCheckout}
-      >
-
-        <div>
-
-          <label
-            htmlFor="customerId"
+          <form
+            className="checkout-form"
+            onSubmit={handleCheckout}
           >
-            Customer ID
-          </label>
 
-          <input
-            id="customerId"
-            type="number"
-            value={customerId}
-            onChange={(event) =>
-              setCustomerId(
-                event.target.value
-              )
-            }
-            required
-          />
+            <div>
+
+              <label htmlFor="customerId">
+                Customer ID
+              </label>
+
+              <input
+                id="customerId"
+                type="number"
+                value={customerId}
+                onChange={(event) =>
+                  setCustomerId(
+                    event.target.value
+                  )
+                }
+                placeholder="Enter customer ID"
+                required
+              />
+
+            </div>
+
+
+            <div>
+
+              <label htmlFor="paymentType">
+                Payment Method
+              </label>
+
+              <select
+                id="paymentType"
+                value={paymentType}
+                onChange={(event) =>
+                  setPaymentType(
+                    event.target.value
+                  )
+                }
+              >
+
+                <option value="CARD">
+                  Card
+                </option>
+
+                <option value="UPI">
+                  UPI
+                </option>
+
+                <option value="WALLET">
+                  Wallet
+                </option>
+
+              </select>
+
+            </div>
+
+
+            {error && (
+
+              <div className="error-message">
+                {error}
+              </div>
+
+            )}
+
+
+            <button
+              className="primary-button place-order-button"
+              type="submit"
+              disabled={loading}
+            >
+
+              {loading
+                ? "Processing..."
+                : "Place Order"}
+
+            </button>
+
+          </form>
 
         </div>
 
 
-        <div>
+        <aside className="checkout-summary">
 
-          <label
-            htmlFor="paymentType"
-          >
-            Payment Method
-          </label>
+          <h2>
+            Order Summary
+          </h2>
 
-          <select
-            id="paymentType"
-            value={paymentType}
-            onChange={(event) =>
-              setPaymentType(
-                event.target.value
+
+          <div className="checkout-items">
+
+            {cartItems.map(
+              (item) => (
+
+                <div
+                  className="checkout-item"
+                  key={item.id}
+                >
+
+                  <div>
+
+                    <strong>
+                      {item.name}
+                    </strong>
+
+                    <p>
+                      Qty: {item.cartQuantity}
+                    </p>
+
+                  </div>
+
+
+                  <strong>
+
+                    ₹{
+                      item.price *
+                      item.cartQuantity
+                    }
+
+                  </strong>
+
+                </div>
+
               )
-            }
+            )}
+
+          </div>
+
+
+          <hr />
+
+
+          <div className="summary-row">
+
+            <span>
+              Subtotal
+            </span>
+
+            <span>
+              ₹{total}
+            </span>
+
+          </div>
+
+
+          <div className="summary-row">
+
+            <span>
+              Delivery
+            </span>
+
+            <span className="free-delivery">
+              Free
+            </span>
+
+          </div>
+
+
+          <div className="summary-total">
+
+            <span>
+              Total
+            </span>
+
+            <span>
+              ₹{total}
+            </span>
+
+          </div>
+
+
+          <Link
+            to="/shop/cart"
+            className="edit-cart-link"
           >
+            ← Edit Cart
+          </Link>
 
-            <option value="CARD">
-              Card
-            </option>
+        </aside>
 
-            <option value="UPI">
-              UPI
-            </option>
-
-            <option value="WALLET">
-              Wallet
-            </option>
-
-          </select>
-
-        </div>
-
-
-        {error && (
-          <p>{error}</p>
-        )}
-
-
-        <button
-          type="submit"
-          disabled={loading}
-        >
-
-          {loading
-            ? "Processing..."
-            : "Place Order"}
-
-        </button>
-
-      </form>
+      </div>
 
     </div>
   );
