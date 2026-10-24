@@ -13,13 +13,17 @@ import {
 
 function AdminInventory() {
 
-  const [inventory, setInventory] = useState([]);
+  const [inventory, setInventory] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] =
+    useState("");
 
 
   async function loadInventory() {
@@ -28,29 +32,45 @@ function AdminInventory() {
 
       setError("");
 
-      const products = await getProducts();
+      const products =
+        await getProducts();
 
 
       const inventoryData =
         await Promise.all(
 
-          products.map(async (product) => {
+          products.map(
+            async (product) => {
 
-            const stock =
-              await getStock(product.id);
+              const stock =
+                await getStock(
+                  product.id
+                );
 
-            return {
-              productId: product.id,
-              name: product.name,
-              category: product.category,
-              quantity: stock.quantity,
-            };
 
-          })
+              return {
+                productId:
+                  product.id,
+
+                name:
+                  product.name,
+
+                category:
+                  product.category,
+
+                quantity:
+                  stock.quantity,
+              };
+
+            }
+          )
+
         );
 
 
-      setInventory(inventoryData);
+      setInventory(
+        inventoryData
+      );
 
     } catch (error) {
 
@@ -73,10 +93,11 @@ function AdminInventory() {
 
   async function handleSetStock(item) {
 
-    const value = window.prompt(
-      `Set stock quantity for ${item.name}`,
-      item.quantity
-    );
+    const value =
+      window.prompt(
+        `Set stock quantity for ${item.name}`,
+        item.quantity
+      );
 
 
     if (value === null) {
@@ -84,7 +105,8 @@ function AdminInventory() {
     }
 
 
-    const quantity = Number(value);
+    const quantity =
+      Number(value);
 
 
     if (
@@ -129,9 +151,10 @@ function AdminInventory() {
 
   async function handleAddStock(item) {
 
-    const value = window.prompt(
-      `Enter quantity to add for ${item.name}`
-    );
+    const value =
+      window.prompt(
+        `Enter quantity to add for ${item.name}`
+      );
 
 
     if (value === null) {
@@ -139,7 +162,8 @@ function AdminInventory() {
     }
 
 
-    const quantity = Number(value);
+    const quantity =
+      Number(value);
 
 
     if (
@@ -184,7 +208,11 @@ function AdminInventory() {
 
   if (loading) {
 
-    return <p>Loading inventory...</p>;
+    return (
+      <p>
+        Loading inventory...
+      </p>
+    );
   }
 
 
@@ -192,94 +220,271 @@ function AdminInventory() {
 
     <div>
 
-      <h1>Inventory</h1>
+      {/* PAGE HEADER */}
 
+      <div className="admin-page-header">
+
+        <h1>
+          Inventory
+        </h1>
+
+        <p>
+          Monitor stock levels and
+          update product inventory.
+        </p>
+
+      </div>
+
+
+      {/* SUCCESS */}
 
       {message && (
-        <p>{message}</p>
+
+        <div className="success-message">
+          {message}
+        </div>
+
       )}
 
+
+      {/* ERROR */}
 
       {error && (
-        <p>{error}</p>
+
+        <div className="error-message">
+          {error}
+        </div>
+
       )}
 
 
-      <h2>Inventory List</h2>
+      {/* INVENTORY SUMMARY */}
+
+      <div className="inventory-summary">
+
+        <div className="dashboard-card">
+
+          <p>
+            Products
+          </p>
+
+          <h2>
+            {inventory.length}
+          </h2>
+
+        </div>
 
 
-      <table>
+        <div className="dashboard-card">
 
-        <thead>
+          <p>
+            Total Units
+          </p>
 
-          <tr>
+          <h2>
 
-            <th>Product ID</th>
+            {inventory.reduce(
+              (total, item) =>
+                total +
+                Number(item.quantity),
 
-            <th>Product</th>
+              0
+            )}
 
-            <th>Category</th>
+          </h2>
 
-            <th>Quantity</th>
-
-            <th>Actions</th>
-
-          </tr>
-
-        </thead>
+        </div>
 
 
-        <tbody>
+        <div className="dashboard-card">
 
-          {inventory.map((item) => (
+          <p>
+            Out of Stock
+          </p>
 
-            <tr key={item.productId}>
+          <h2 className="dashboard-warning">
 
-              <td>
-                {item.productId}
-              </td>
+            {
+              inventory.filter(
+                (item) =>
+                  Number(item.quantity) === 0
+              ).length
+            }
 
-              <td>
-                {item.name}
-              </td>
+          </h2>
 
-              <td>
-                {item.category}
-              </td>
+        </div>
 
-              <td>
-                {item.quantity}
-              </td>
+      </div>
 
-              <td>
 
-                <button
-                  onClick={() =>
-                    handleSetStock(item)
-                  }
-                >
-                  Set Stock
-                </button>
+      {/* INVENTORY TABLE */}
 
-                {" "}
+      <div className="admin-card admin-table-card">
 
-                <button
-                  onClick={() =>
-                    handleAddStock(item)
-                  }
-                >
-                  Add Stock
-                </button>
+        <div className="admin-section-header">
 
-              </td>
+          <div>
 
-            </tr>
+            <h2>
+              Inventory List
+            </h2>
 
-          ))}
+            <p>
+              Current stock availability
+              for all products.
+            </p>
 
-        </tbody>
+          </div>
 
-      </table>
+        </div>
+
+
+        <div className="table-container">
+
+          <table className="admin-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Product ID
+                </th>
+
+                <th>
+                  Product
+                </th>
+
+                <th>
+                  Category
+                </th>
+
+                <th>
+                  Quantity
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Actions
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              {inventory.map(
+                (item) => (
+
+                  <tr
+                    key={
+                      item.productId
+                    }
+                  >
+
+                    <td>
+                      {item.productId}
+                    </td>
+
+
+                    <td>
+
+                      <strong>
+                        {item.name}
+                      </strong>
+
+                    </td>
+
+
+                    <td>
+
+                      <span className="category-badge">
+                        {item.category}
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <strong className="inventory-quantity">
+                        {item.quantity}
+                      </strong>
+
+                    </td>
+
+
+                    <td>
+
+                      <span
+                        className={
+                          item.quantity > 0
+                            ? "inventory-status in-stock-inventory"
+                            : "inventory-status out-stock-inventory"
+                        }
+                      >
+
+                        <span className="inventory-dot"></span>
+
+
+                        {item.quantity > 0
+                          ? "In Stock"
+                          : "Out of Stock"}
+
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <div className="admin-action-buttons">
+
+                        <button
+                          className="admin-edit-button"
+                          onClick={() =>
+                            handleSetStock(
+                              item
+                            )
+                          }
+                        >
+                          Set Stock
+                        </button>
+
+
+                        <button
+                          className="admin-stock-button"
+                          onClick={() =>
+                            handleAddStock(
+                              item
+                            )
+                          }
+                        >
+                          Add Stock
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                )
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
 
     </div>
   );

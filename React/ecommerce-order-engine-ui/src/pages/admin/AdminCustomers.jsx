@@ -19,11 +19,17 @@ function AdminCustomers() {
     email: "",
   });
 
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] =
+    useState(null);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  const [message, setMessage] =
+    useState("");
 
 
   async function loadCustomers() {
@@ -32,7 +38,8 @@ function AdminCustomers() {
 
       setError("");
 
-      const data = await getCustomers();
+      const data =
+        await getCustomers();
 
       setCustomers(data);
 
@@ -57,12 +64,18 @@ function AdminCustomers() {
 
   function handleChange(event) {
 
-    const { name, value } = event.target;
+    const {
+      name,
+      value,
+    } = event.target;
 
-    setForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
+
+    setForm(
+      (previousForm) => ({
+        ...previousForm,
+        [name]: value,
+      })
+    );
   }
 
 
@@ -76,11 +89,14 @@ function AdminCustomers() {
 
     const customer = {
 
-      id: Number(form.id),
+      id:
+        Number(form.id),
 
-      name: form.name,
+      name:
+        form.name,
 
-      email: form.email,
+      email:
+        form.email,
     };
 
 
@@ -99,7 +115,9 @@ function AdminCustomers() {
 
       } else {
 
-        await createCustomer(customer);
+        await createCustomer(
+          customer
+        );
 
         setMessage(
           "Customer created successfully"
@@ -121,25 +139,37 @@ function AdminCustomers() {
 
   function handleEdit(customer) {
 
-    setEditingId(customer.id);
+    setEditingId(
+      customer.id
+    );
+
 
     setForm({
-      id: customer.id,
-      name: customer.name,
-      email: customer.email,
+      id:
+        customer.id,
+
+      name:
+        customer.name,
+
+      email:
+        customer.email,
     });
+
 
     setMessage("");
     setError("");
   }
 
 
-  async function handleEmailUpdate(customer) {
+  async function handleEmailUpdate(
+    customer
+  ) {
 
-    const newEmail = window.prompt(
-      `Enter new email for ${customer.name}`,
-      customer.email
-    );
+    const newEmail =
+      window.prompt(
+        `Enter new email for ${customer.name}`,
+        customer.email
+      );
 
 
     if (newEmail === null) {
@@ -165,7 +195,7 @@ function AdminCustomers() {
 
       await updateCustomerEmail(
         customer.id,
-        newEmail
+        newEmail.trim()
       );
 
 
@@ -244,7 +274,11 @@ function AdminCustomers() {
 
   if (loading) {
 
-    return <p>Loading customers...</p>;
+    return (
+      <p>
+        Loading customers...
+      </p>
+    );
   }
 
 
@@ -252,176 +286,314 @@ function AdminCustomers() {
 
     <div>
 
-      <h1>Customers</h1>
+      {/* PAGE HEADER */}
+
+      <div className="admin-page-header">
+
+        <h1>
+          Customers
+        </h1>
+
+        <p>
+          Create, edit and manage
+          customers in the store.
+        </p>
+
+      </div>
 
 
-      <h2>
-        {editingId !== null
-          ? "Edit Customer"
-          : "Add Customer"}
-      </h2>
-
-
-      <form onSubmit={handleSubmit}>
-
-        <div>
-
-          <label htmlFor="id">
-            Customer ID
-          </label>
-
-          <input
-            id="id"
-            name="id"
-            type="number"
-            value={form.id}
-            onChange={handleChange}
-            disabled={editingId !== null}
-            required
-          />
-
-        </div>
-
-
-        <div>
-
-          <label htmlFor="name">
-            Name
-          </label>
-
-          <input
-            id="name"
-            name="name"
-            type="text"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-
-        </div>
-
-
-        <div>
-
-          <label htmlFor="email">
-            Email
-          </label>
-
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-
-        </div>
-
-
-        <button type="submit">
-
-          {editingId !== null
-            ? "Update Customer"
-            : "Add Customer"}
-
-        </button>
-
-
-        {editingId !== null && (
-
-          <button
-            type="button"
-            onClick={handleCancelEdit}
-          >
-            Cancel
-          </button>
-
-        )}
-
-      </form>
-
+      {/* SUCCESS MESSAGE */}
 
       {message && (
-        <p>{message}</p>
+
+        <div className="success-message">
+          {message}
+        </div>
+
       )}
 
+
+      {/* ERROR MESSAGE */}
 
       {error && (
-        <p>{error}</p>
+
+        <div className="error-message">
+          {error}
+        </div>
+
       )}
 
 
-      <h2>Customer List</h2>
+      {/* CUSTOMER FORM */}
+
+      <div className="admin-card admin-form-card">
+
+        <div className="admin-section-header">
+
+          <h2>
+
+            {editingId !== null
+              ? "Edit Customer"
+              : "Add Customer"}
+
+          </h2>
+
+        </div>
 
 
-      <table>
+        <form
+          className="admin-form"
+          onSubmit={handleSubmit}
+        >
 
-        <thead>
+          <div className="admin-form-grid">
 
-          <tr>
+            <div>
 
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Actions</th>
+              <label htmlFor="id">
+                Customer ID
+              </label>
 
-          </tr>
+              <input
+                id="id"
+                name="id"
+                type="number"
+                value={form.id}
+                onChange={handleChange}
+                disabled={
+                  editingId !== null
+                }
+                placeholder="Enter customer ID"
+                required
+              />
 
-        </thead>
+            </div>
 
 
-        <tbody>
+            <div>
 
-          {customers.map((customer) => (
+              <label htmlFor="name">
+                Customer Name
+              </label>
 
-            <tr key={customer.id}>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Enter customer name"
+                required
+              />
 
-              <td>{customer.id}</td>
+            </div>
 
-              <td>{customer.name}</td>
 
-              <td>{customer.email}</td>
+            <div>
 
-              <td>
+              <label htmlFor="email">
+                Email Address
+              </label>
 
-                <button
-                  onClick={() =>
-                    handleEdit(customer)
-                  }
-                >
-                  Edit
-                </button>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Enter customer email"
+                required
+              />
 
-                {" "}
+            </div>
 
-                <button
-                  onClick={() =>
-                    handleEmailUpdate(customer)
-                  }
-                >
+          </div>
+
+
+          <div className="admin-form-actions">
+
+            <button
+              className="primary-button"
+              type="submit"
+            >
+
+              {editingId !== null
+                ? "Update Customer"
+                : "Add Customer"}
+
+            </button>
+
+
+            {editingId !== null && (
+
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={
+                  handleCancelEdit
+                }
+              >
+                Cancel
+              </button>
+
+            )}
+
+          </div>
+
+        </form>
+
+      </div>
+
+
+      {/* CUSTOMER LIST */}
+
+      <div className="admin-card admin-table-card">
+
+        <div className="admin-section-header">
+
+          <div>
+
+            <h2>
+              Customer List
+            </h2>
+
+            <p>
+              {customers.length} customers
+              currently registered.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div className="table-container">
+
+          <table className="admin-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  ID
+                </th>
+
+                <th>
+                  Name
+                </th>
+
+                <th>
                   Email
-                </button>
+                </th>
 
-                {" "}
+                <th>
+                  Actions
+                </th>
 
-                <button
-                  onClick={() =>
-                    handleDelete(customer.id)
-                  }
-                >
-                  Delete
-                </button>
+              </tr>
 
-              </td>
+            </thead>
 
-            </tr>
 
-          ))}
+            <tbody>
 
-        </tbody>
+              {customers.map(
+                (customer) => (
 
-      </table>
+                  <tr key={customer.id}>
+
+                    <td>
+                      {customer.id}
+                    </td>
+
+
+                    <td>
+
+                      <div className="customer-name-cell">
+
+                        <div className="customer-avatar">
+
+                          {customer.name
+                            ?.charAt(0)
+                            .toUpperCase()}
+
+                        </div>
+
+
+                        <strong>
+                          {customer.name}
+                        </strong>
+
+                      </div>
+
+                    </td>
+
+
+                    <td>
+
+                      <span className="customer-email">
+                        {customer.email}
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <div className="admin-action-buttons">
+
+                        <button
+                          className="admin-edit-button"
+                          onClick={() =>
+                            handleEdit(
+                              customer
+                            )
+                          }
+                        >
+                          Edit
+                        </button>
+
+
+                        <button
+                          className="admin-email-button"
+                          onClick={() =>
+                            handleEmailUpdate(
+                              customer
+                            )
+                          }
+                        >
+                          Email
+                        </button>
+
+
+                        <button
+                          className="admin-delete-button"
+                          onClick={() =>
+                            handleDelete(
+                              customer.id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                )
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
 
     </div>
   );

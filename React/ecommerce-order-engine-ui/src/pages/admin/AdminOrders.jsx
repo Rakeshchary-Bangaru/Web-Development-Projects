@@ -12,16 +12,22 @@ import {
 
 function AdminOrders() {
 
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] =
+    useState([]);
 
-  const [expandedOrderId, setExpandedOrderId] =
-    useState(null);
+  const [
+    expandedOrderId,
+    setExpandedOrderId,
+  ] = useState(null);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] =
+    useState("");
 
 
   async function loadOrders() {
@@ -30,7 +36,8 @@ function AdminOrders() {
 
       setError("");
 
-      const data = await getOrders();
+      const data =
+        await getOrders();
 
       setOrders(data);
 
@@ -55,24 +62,30 @@ function AdminOrders() {
 
   function handleViewItems(orderId) {
 
-    if (expandedOrderId === orderId) {
+    if (
+      expandedOrderId === orderId
+    ) {
 
       setExpandedOrderId(null);
 
     } else {
 
-      setExpandedOrderId(orderId);
-
+      setExpandedOrderId(
+        orderId
+      );
     }
   }
 
 
-  async function handleStatusUpdate(order) {
+  async function handleStatusUpdate(
+    order
+  ) {
 
-    const newStatus = window.prompt(
-      `Enter new status for Order ${order.id}`,
-      order.status
-    );
+    const newStatus =
+      window.prompt(
+        `Enter new status for Order ${order.id}`,
+        order.status
+      );
 
 
     if (newStatus === null) {
@@ -80,7 +93,9 @@ function AdminOrders() {
     }
 
 
-    if (newStatus.trim() === "") {
+    if (
+      newStatus.trim() === ""
+    ) {
 
       setError(
         "Please enter a valid order status"
@@ -98,7 +113,9 @@ function AdminOrders() {
 
       await updateOrderStatus(
         order.id,
-        newStatus.trim()
+        newStatus
+          .trim()
+          .toUpperCase()
       );
 
 
@@ -123,228 +140,452 @@ function AdminOrders() {
       return "";
     }
 
-    return new Date(date)
-      .toLocaleString();
+
+    return new Date(
+      date
+    ).toLocaleString();
+  }
+
+
+  function getStatusClass(status) {
+
+    if (status === "PAID") {
+      return "order-admin-status status-paid";
+    }
+
+    if (status === "PENDING") {
+      return "order-admin-status status-pending";
+    }
+
+    if (status === "SHIPPED") {
+      return "order-admin-status status-shipped";
+    }
+
+    if (status === "DELIVERED") {
+      return "order-admin-status status-delivered";
+    }
+
+    if (
+      status === "CANCELLED" ||
+      status === "FAILED"
+    ) {
+      return "order-admin-status status-cancelled";
+    }
+
+    return "order-admin-status";
   }
 
 
   if (loading) {
 
-    return <p>Loading orders...</p>;
+    return (
+      <p>
+        Loading orders...
+      </p>
+    );
   }
+
+
+  const totalRevenue =
+    orders.reduce(
+      (total, order) =>
+        total +
+        Number(order.total),
+      0
+    );
+
+
+  const paidOrders =
+    orders.filter(
+      (order) =>
+        order.status === "PAID"
+    ).length;
 
 
   return (
 
     <div>
 
-      <h1>Orders</h1>
+      {/* PAGE HEADER */}
 
+      <div className="admin-page-header">
+
+        <h1>
+          Orders
+        </h1>
+
+        <p>
+          View customer orders,
+          payment details and
+          manage order status.
+        </p>
+
+      </div>
+
+
+      {/* SUCCESS */}
 
       {message && (
-        <p>{message}</p>
+
+        <div className="success-message">
+          {message}
+        </div>
+
       )}
 
+
+      {/* ERROR */}
 
       {error && (
-        <p>{error}</p>
+
+        <div className="error-message">
+          {error}
+        </div>
+
       )}
 
 
-      <h2>Order List</h2>
+      {/* ORDER SUMMARY */}
+
+      <div className="orders-admin-summary">
+
+        <div className="dashboard-card">
+
+          <p>
+            Total Orders
+          </p>
+
+          <h2>
+            {orders.length}
+          </h2>
+
+        </div>
 
 
-      <table>
+        <div className="dashboard-card">
 
-        <thead>
+          <p>
+            Paid Orders
+          </p>
 
-          <tr>
+          <h2>
+            {paidOrders}
+          </h2>
 
-            <th>Order ID</th>
-
-            <th>Customer</th>
-
-            <th>Payment</th>
-
-            <th>Status</th>
-
-            <th>Created At</th>
-
-            <th>Total</th>
-
-            <th>Actions</th>
-
-          </tr>
-
-        </thead>
+        </div>
 
 
-        <tbody>
+        <div className="dashboard-card">
 
-          {orders.map((order) => (
+          <p>
+            Total Revenue
+          </p>
 
-            <Fragment key={order.id}>
-              <tr key={order.id}>
+          <h2>
+            ₹{totalRevenue}
+          </h2>
 
-                <td>
-                  {order.id}
-                </td>
+        </div>
 
-                <td>
-                  {order.customerName}
-                  {" "}
-                  ({order.customerId})
-                </td>
+      </div>
 
-                <td>
-                  {order.paymentType}
-                </td>
 
-                <td>
-                  {order.status}
-                </td>
+      {/* ORDER TABLE */}
 
-                <td>
-                  {formatDate(
-                    order.createdAt
-                  )}
-                </td>
+      <div className="admin-card admin-table-card">
 
-                <td>
-                  ₹{order.total}
-                </td>
+        <div className="admin-section-header">
 
-                <td>
+          <div>
 
-                  <button
-                    onClick={() =>
-                      handleViewItems(
-                        order.id
-                      )
-                    }
-                  >
+            <h2>
+              Order List
+            </h2>
 
-                    {expandedOrderId === order.id
-                      ? "Hide Items"
-                      : "View Items"}
+            <p>
+              {orders.length} orders
+              currently available.
+            </p>
 
-                  </button>
+          </div>
 
-                  {" "}
+        </div>
 
-                  <button
-                    onClick={() =>
-                      handleStatusUpdate(
-                        order
-                      )
-                    }
-                  >
-                    Update Status
-                  </button>
 
-                </td>
+        <div className="table-container">
+
+          <table className="admin-table admin-orders-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Order ID
+                </th>
+
+                <th>
+                  Customer
+                </th>
+
+                <th>
+                  Payment
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Created At
+                </th>
+
+                <th>
+                  Total
+                </th>
+
+                <th>
+                  Actions
+                </th>
 
               </tr>
 
-
-              {expandedOrderId ===
-                order.id && (
-
-                <tr
-                  key={`${order.id}-items`}
-                >
-
-                  <td colSpan="7">
-
-                    <h3>
-                      Order Items
-                    </h3>
+            </thead>
 
 
-                    <table>
+            <tbody>
 
-                      <thead>
+              {orders.map(
+                (order) => (
 
-                        <tr>
+                  <Fragment
+                    key={order.id}
+                  >
 
-                          <th>
-                            Product ID
-                          </th>
+                    <tr>
 
-                          <th>
-                            Product
-                          </th>
+                      <td>
 
-                          <th>
-                            Quantity
-                          </th>
+                        <strong>
+                          #{order.id}
+                        </strong>
 
-                          <th>
-                            Subtotal
-                          </th>
-
-                        </tr>
-
-                      </thead>
+                      </td>
 
 
-                      <tbody>
+                      <td>
 
-                        {order.items.map(
-                          (item) => (
+                        <div className="admin-order-customer">
 
-                            <tr
-                              key={
-                                item.productId
-                              }
-                            >
+                          <strong>
+                            {order.customerName}
+                          </strong>
 
-                              <td>
-                                {
-                                  item.productId
-                                }
-                              </td>
+                          <span>
+                            ID: {order.customerId}
+                          </span>
 
-                              <td>
-                                {
-                                  item.productName
-                                }
-                              </td>
+                        </div>
 
-                              <td>
-                                {
-                                  item.quantity
-                                }
-                              </td>
+                      </td>
 
-                              <td>
-                                ₹{
-                                  item.subtotal
-                                }
-                              </td>
 
-                            </tr>
+                      <td>
 
-                          )
+                        <span className="payment-badge">
+                          {order.paymentType}
+                        </span>
+
+                      </td>
+
+
+                      <td>
+
+                        <span
+                          className={
+                            getStatusClass(
+                              order.status
+                            )
+                          }
+                        >
+
+                          <span className="status-dot"></span>
+
+                          {order.status}
+
+                        </span>
+
+                      </td>
+
+
+                      <td>
+                        {formatDate(
+                          order.createdAt
                         )}
+                      </td>
 
-                      </tbody>
 
-                    </table>
+                      <td className="admin-order-total">
 
-                  </td>
+                        ₹{order.total}
 
-                </tr>
+                      </td>
 
+
+                      <td>
+
+                        <div className="admin-action-buttons">
+
+                          <button
+                            className="admin-view-button"
+                            onClick={() =>
+                              handleViewItems(
+                                order.id
+                              )
+                            }
+                          >
+
+                            {expandedOrderId ===
+                            order.id
+                              ? "Hide Items"
+                              : "View Items"}
+
+                          </button>
+
+
+                          <button
+                            className="admin-status-button"
+                            onClick={() =>
+                              handleStatusUpdate(
+                                order
+                              )
+                            }
+                          >
+                            Update Status
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+
+                    {expandedOrderId ===
+                      order.id && (
+
+                      <tr className="order-items-row">
+
+                        <td colSpan="7">
+
+                          <div className="admin-order-items">
+
+                            <div className="order-items-header">
+
+                              <h3>
+                                Order Items
+                              </h3>
+
+                              <span>
+                                Order #{order.id}
+                              </span>
+
+                            </div>
+
+
+                            <table className="order-items-table">
+
+                              <thead>
+
+                                <tr>
+
+                                  <th>
+                                    Product ID
+                                  </th>
+
+                                  <th>
+                                    Product
+                                  </th>
+
+                                  <th>
+                                    Quantity
+                                  </th>
+
+                                  <th>
+                                    Subtotal
+                                  </th>
+
+                                </tr>
+
+                              </thead>
+
+
+                              <tbody>
+
+                                {order.items.map(
+                                  (item) => (
+
+                                    <tr
+                                      key={
+                                        item.productId
+                                      }
+                                    >
+
+                                      <td>
+                                        {item.productId}
+                                      </td>
+
+                                      <td>
+
+                                        <strong>
+                                          {
+                                            item.productName
+                                          }
+                                        </strong>
+
+                                      </td>
+
+                                      <td>
+                                        {item.quantity}
+                                      </td>
+
+                                      <td>
+
+                                        ₹{
+                                          item.subtotal
+                                        }
+
+                                      </td>
+
+                                    </tr>
+
+                                  )
+                                )}
+
+                              </tbody>
+
+                            </table>
+
+                          </div>
+
+                        </td>
+
+                      </tr>
+
+                    )}
+
+                  </Fragment>
+
+                )
               )}
 
-            </Fragment>
+            </tbody>
 
-          ))}
+          </table>
 
-        </tbody>
+        </div>
 
-      </table>
+      </div>
 
     </div>
   );

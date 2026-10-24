@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import {
   getProducts,
@@ -19,20 +22,24 @@ import {
 
 function AdminDashboard() {
 
-  const [stats, setStats] = useState({
-    products: 0,
-    customers: 0,
-    orders: 0,
-    revenue: 0,
-    totalStock: 0,
-    outOfStock: 0,
-  });
+  const [stats, setStats] =
+    useState({
+      products: 0,
+      customers: 0,
+      orders: 0,
+      revenue: 0,
+      totalStock: 0,
+      outOfStock: 0,
+    });
+
 
   const [recentOrders, setRecentOrders] =
     useState([]);
 
+
   const [loading, setLoading] =
     useState(true);
+
 
   const [error, setError] =
     useState("");
@@ -44,8 +51,7 @@ function AdminDashboard() {
 
       setError("");
 
-      // Get products, customers and orders
-      // at the same time
+
       const [
         products,
         customers,
@@ -57,77 +63,103 @@ function AdminDashboard() {
       ]);
 
 
-      // Get inventory for every product
       const inventory =
         await Promise.all(
 
-          products.map(async (product) => {
+          products.map(
+            async (product) => {
 
-            const stock =
-              await getStock(product.id);
+              const stock =
+                await getStock(
+                  product.id
+                );
 
-            return {
-              productId: product.id,
-              quantity: stock.quantity,
-            };
 
-          })
+              return {
+                productId:
+                  product.id,
+
+                quantity:
+                  stock.quantity,
+              };
+
+            }
+          )
 
         );
 
 
-      // Calculate total revenue
       const totalRevenue =
         orders.reduce(
           (total, order) =>
-            total + Number(order.total),
+            total +
+            Number(order.total),
+
           0
         );
 
 
-      // Calculate total inventory quantity
       const totalStock =
         inventory.reduce(
           (total, item) =>
-            total + item.quantity,
+            total +
+            Number(item.quantity),
+
           0
         );
 
 
-      // Products with zero stock
       const outOfStock =
         inventory.filter(
           (item) =>
-            item.quantity === 0
+            Number(item.quantity) === 0
         ).length;
 
 
       setStats({
-        products: products.length,
-        customers: customers.length,
-        orders: orders.length,
-        revenue: totalRevenue,
-        totalStock: totalStock,
-        outOfStock: outOfStock,
+        products:
+          products.length,
+
+        customers:
+          customers.length,
+
+        orders:
+          orders.length,
+
+        revenue:
+          totalRevenue,
+
+        totalStock:
+          totalStock,
+
+        outOfStock:
+          outOfStock,
       });
 
 
-      // Latest 5 orders
       const sortedOrders =
         [...orders]
           .sort(
             (a, b) =>
-              new Date(b.createdAt) -
-              new Date(a.createdAt)
+              new Date(
+                b.createdAt
+              ) -
+              new Date(
+                a.createdAt
+              )
           )
           .slice(0, 5);
 
 
-      setRecentOrders(sortedOrders);
+      setRecentOrders(
+        sortedOrders
+      );
 
     } catch (error) {
 
-      setError(error.message);
+      setError(
+        error.message
+      );
 
     } finally {
 
@@ -150,15 +182,21 @@ function AdminDashboard() {
       return "";
     }
 
-    return new Date(date)
-      .toLocaleString();
+
+    return new Date(
+      date
+    ).toLocaleString();
   }
 
 
   if (loading) {
 
     return (
-      <p>Loading dashboard...</p>
+
+      <p>
+        Loading dashboard...
+      </p>
+
     );
   }
 
@@ -167,146 +205,264 @@ function AdminDashboard() {
 
     <div>
 
-      <h1>Admin Dashboard</h1>
+      {/* PAGE HEADER */}
 
+      <div className="admin-page-header">
+
+        <h1>
+          Dashboard
+        </h1>
+
+        <p>
+          Overview of products,
+          customers, orders and
+          inventory.
+        </p>
+
+      </div>
+
+
+      {/* ERROR */}
 
       {error && (
-        <p>{error}</p>
+
+        <div className="error-message">
+
+          {error}
+
+        </div>
+
       )}
 
 
-      <h2>Overview</h2>
+      {/* DASHBOARD STATISTICS */}
+
+      <div className="dashboard-grid">
 
 
-      <div>
+        <div className="dashboard-card">
 
-        <div>
-          <h3>Total Products</h3>
-          <p>{stats.products}</p>
-        </div>
-
-
-        <div>
-          <h3>Total Customers</h3>
-          <p>{stats.customers}</p>
-        </div>
-
-
-        <div>
-          <h3>Total Orders</h3>
-          <p>{stats.orders}</p>
-        </div>
-
-
-        <div>
-          <h3>Total Revenue</h3>
           <p>
-            ₹{stats.revenue}
+            Total Products
           </p>
+
+          <h2>
+            {stats.products}
+          </h2>
+
         </div>
 
 
-        <div>
-          <h3>Total Stock</h3>
-          <p>{stats.totalStock}</p>
+        <div className="dashboard-card">
+
+          <p>
+            Total Customers
+          </p>
+
+          <h2>
+            {stats.customers}
+          </h2>
+
         </div>
 
 
-        <div>
-          <h3>Out of Stock</h3>
-          <p>{stats.outOfStock}</p>
+        <div className="dashboard-card">
+
+          <p>
+            Total Orders
+          </p>
+
+          <h2>
+            {stats.orders}
+          </h2>
+
+        </div>
+
+
+        <div className="dashboard-card">
+
+          <p>
+            Total Revenue
+          </p>
+
+          <h2>
+            ₹{stats.revenue}
+          </h2>
+
+        </div>
+
+
+        <div className="dashboard-card">
+
+          <p>
+            Total Stock
+          </p>
+
+          <h2>
+            {stats.totalStock}
+          </h2>
+
+        </div>
+
+
+        <div className="dashboard-card">
+
+          <p>
+            Out of Stock
+          </p>
+
+          <h2
+            className={
+              stats.outOfStock > 0
+                ? "dashboard-warning"
+                : ""
+            }
+          >
+            {stats.outOfStock}
+          </h2>
+
         </div>
 
       </div>
 
 
-      <h2>Recent Orders</h2>
+      {/* RECENT ORDERS */}
+
+      <div className="admin-card dashboard-orders">
+
+        <div className="dashboard-section-header">
+
+          <div>
+
+            <h2>
+              Recent Orders
+            </h2>
+
+            <p>
+              Latest orders placed
+              by customers.
+            </p>
+
+          </div>
+
+        </div>
 
 
-      {recentOrders.length === 0 ? (
+        {recentOrders.length === 0 ? (
 
-        <p>No orders available.</p>
+          <p>
+            No orders available.
+          </p>
 
-      ) : (
+        ) : (
 
-        <table>
+          <div className="table-container">
 
-          <thead>
+            <table>
 
-            <tr>
+              <thead>
 
-              <th>
-                Order ID
-              </th>
+                <tr>
 
-              <th>
-                Customer
-              </th>
+                  <th>
+                    Order ID
+                  </th>
 
-              <th>
-                Payment
-              </th>
+                  <th>
+                    Customer
+                  </th>
 
-              <th>
-                Status
-              </th>
+                  <th>
+                    Payment
+                  </th>
 
-              <th>
-                Total
-              </th>
+                  <th>
+                    Status
+                  </th>
 
-              <th>
-                Created At
-              </th>
+                  <th>
+                    Total
+                  </th>
 
-            </tr>
-
-          </thead>
-
-
-          <tbody>
-
-            {recentOrders.map(
-              (order) => (
-
-                <tr key={order.id}>
-
-                  <td>
-                    {order.id}
-                  </td>
-
-                  <td>
-                    {order.customerName}
-                  </td>
-
-                  <td>
-                    {order.paymentType}
-                  </td>
-
-                  <td>
-                    {order.status}
-                  </td>
-
-                  <td>
-                    ₹{order.total}
-                  </td>
-
-                  <td>
-                    {formatDate(
-                      order.createdAt
-                    )}
-                  </td>
+                  <th>
+                    Created At
+                  </th>
 
                 </tr>
 
-              )
-            )}
+              </thead>
 
-          </tbody>
 
-        </table>
+              <tbody>
 
-      )}
+                {recentOrders.map(
+                  (order) => (
+
+                    <tr key={order.id}>
+
+                      <td>
+                        #{order.id}
+                      </td>
+
+
+                      <td>
+                        {order.customerName}
+                      </td>
+
+
+                      <td>
+                        {order.paymentType}
+                      </td>
+
+
+                      <td>
+
+                        <span
+                          className={
+                            order.status === "PAID"
+                              ? "admin-status paid-admin-status"
+                              : "admin-status"
+                          }
+                        >
+
+                          <span className="status-dot">
+
+                          </span>
+
+                          {order.status}
+
+                        </span>
+
+                      </td>
+
+
+                      <td>
+                        ₹{order.total}
+                      </td>
+
+
+                      <td>
+
+                        {formatDate(
+                          order.createdAt
+                        )}
+
+                      </td>
+
+                    </tr>
+
+                  )
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        )}
+
+      </div>
 
     </div>
   );

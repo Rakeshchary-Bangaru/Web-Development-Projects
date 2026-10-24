@@ -1,23 +1,84 @@
-import { Link, Outlet } from "react-router-dom";
+import {
+  NavLink,
+  Outlet,
+} from "react-router-dom";
+
 
 function AdminLayout() {
+
   return (
-    <div>
-      <h2>Admin Panel</h2>
 
-      <nav>
-        <Link to="/admin">Dashboard</Link>{" | "}
-        <Link to="/admin/products">Products</Link>{" | "}
-        <Link to="/admin/customers">Customers</Link>{" | "}
-        <Link to="/admin/inventory">Inventory</Link>{" | "}
-        <Link to="/admin/orders">Orders</Link>
-      </nav>
+    <div className="admin-layout">
 
-      <hr />
+      <aside className="admin-sidebar">
 
-      <Outlet />
+        <div className="admin-brand">
+          Admin Panel
+        </div>
+
+
+        <nav className="admin-nav">
+
+          <NavLink
+            to="/admin/dashboard"
+          >
+            Dashboard
+          </NavLink>
+
+
+          <NavLink
+            to="/admin/products"
+          >
+            Products
+          </NavLink>
+
+
+          <NavLink
+            to="/admin/customers"
+          >
+            Customers
+          </NavLink>
+
+
+          <NavLink
+            to="/admin/inventory"
+          >
+            Inventory
+          </NavLink>
+
+
+          <NavLink
+            to="/admin/orders"
+          >
+            Orders
+          </NavLink>
+
+        </nav>
+
+
+        <div className="admin-sidebar-footer">
+
+          <NavLink
+            to="/shop"
+            className="back-to-shop"
+          >
+            ← Back to Store
+          </NavLink>
+
+        </div>
+
+      </aside>
+
+
+      <main className="admin-main">
+
+        <Outlet />
+
+      </main>
+
     </div>
   );
 }
+
 
 export default AdminLayout;
