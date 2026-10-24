@@ -1,8 +1,8 @@
+import { Link } from "react-router-dom";
+
 import {
   useCart,
 } from "../../context/CartContext";
-
-import { Link } from "react-router-dom";
 
 
 function Cart() {
@@ -20,8 +20,7 @@ function Cart() {
     cartItems.reduce(
       (sum, item) =>
         sum +
-        item.price *
-          item.cartQuantity,
+        item.price * item.cartQuantity,
       0
     );
 
@@ -30,13 +29,26 @@ function Cart() {
 
     return (
 
-      <div>
+      <div className="empty-cart">
 
-        <h1>Shopping Cart</h1>
+        <div className="empty-cart-icon">
+          🛒
+        </div>
+
+        <h1>Your Cart is Empty</h1>
 
         <p>
-          Your cart is empty.
+          Add some products to your cart
+          before proceeding to checkout.
         </p>
+
+        <Link to="/shop/products">
+
+          <button className="primary-button">
+            Browse Products
+          </button>
+
+        </Link>
 
       </div>
     );
@@ -47,48 +59,68 @@ function Cart() {
 
     <div>
 
-      <h1>Shopping Cart</h1>
+      <div className="cart-page-header">
+
+        <div>
+
+          <h1>
+            Shopping Cart
+          </h1>
+
+          <p>
+            Review your products and update
+            quantities before checkout.
+          </p>
+
+        </div>
+
+      </div>
 
 
-      <table>
+      <div className="cart-layout">
 
-        <thead>
+        <div className="cart-items">
 
-          <tr>
+          {cartItems.map((item) => (
 
-            <th>Product</th>
+            <div
+              className="cart-item"
+              key={item.id}
+            >
 
-            <th>Price</th>
-
-            <th>Quantity</th>
-
-            <th>Subtotal</th>
-
-            <th>Actions</th>
-
-          </tr>
-
-        </thead>
+              <div className="cart-product-icon">
+                🛍️
+              </div>
 
 
-        <tbody>
+              <div className="cart-product-info">
 
-          {cartItems.map(
-            (item) => (
+                <p className="product-category">
+                  {item.category}
+                </p>
 
-              <tr key={item.id}>
-
-                <td>
+                <h3>
                   {item.name}
-                </td>
+                </h3>
 
+                <p className="cart-product-id">
+                  Product ID: {item.id}
+                </p>
 
-                <td>
+                <p className="cart-product-price">
                   ₹{item.price}
-                </td>
+                </p>
+
+              </div>
 
 
-                <td>
+              <div className="cart-quantity">
+
+                <p>
+                  Quantity
+                </p>
+
+                <div className="quantity-controls">
 
                   <button
                     onClick={() =>
@@ -100,15 +132,13 @@ function Cart() {
                       item.cartQuantity <= 1
                     }
                   >
-                    -
+                    −
                   </button>
 
 
-                  {" "}
-
-                  {item.cartQuantity}
-
-                  {" "}
+                  <span>
+                    {item.cartQuantity}
+                  </span>
 
 
                   <button
@@ -125,61 +155,144 @@ function Cart() {
                     +
                   </button>
 
-                </td>
+                </div>
+
+              </div>
 
 
-                <td>
+              <div className="cart-subtotal">
 
+                <p>
+                  Subtotal
+                </p>
+
+                <strong>
                   ₹{
                     item.price *
                     item.cartQuantity
                   }
+                </strong>
 
-                </td>
-
-
-                <td>
-
-                  <button
-                    onClick={() =>
-                      removeFromCart(
-                        item.id
-                      )
-                    }
-                  >
-                    Remove
-                  </button>
-
-                </td>
-
-              </tr>
-
-            )
-          )}
-
-        </tbody>
-
-      </table>
+              </div>
 
 
-      <h2>
-        Total: ₹{total}
-      </h2>
+              <button
+                className="remove-button"
+                onClick={() =>
+                  removeFromCart(
+                    item.id
+                  )
+                }
+              >
+                Remove
+              </button>
+
+            </div>
+
+          ))}
+
+        </div>
 
 
-          <Link to="/shop/checkout">
-            <button>
-                Proceed to Checkout
+        <aside className="cart-summary">
+
+          <h2>
+            Order Summary
+          </h2>
+
+
+          <div className="summary-row">
+
+            <span>
+              Items
+            </span>
+
+            <span>
+              {
+                cartItems.reduce(
+                  (total, item) =>
+                    total +
+                    item.cartQuantity,
+                  0
+                )
+              }
+            </span>
+
+          </div>
+
+
+          <div className="summary-row">
+
+            <span>
+              Subtotal
+            </span>
+
+            <span>
+              ₹{total}
+            </span>
+
+          </div>
+
+
+          <div className="summary-row">
+
+            <span>
+              Delivery
+            </span>
+
+            <span className="free-delivery">
+              Free
+            </span>
+
+          </div>
+
+
+          <hr />
+
+
+          <div className="summary-total">
+
+            <span>
+              Total
+            </span>
+
+            <span>
+              ₹{total}
+            </span>
+
+          </div>
+
+
+          <Link
+            to="/shop/checkout"
+            className="checkout-link"
+          >
+
+            <button className="primary-button checkout-button">
+              Proceed to Checkout
             </button>
-            </Link>
 
-            {" "}
+          </Link>
 
-      <button
-        onClick={clearCart}
-      >
-        Clear Cart
-      </button>
+
+          <button
+            className="clear-cart-button"
+            onClick={clearCart}
+          >
+            Clear Cart
+          </button>
+
+
+          <Link
+            to="/shop/products"
+            className="continue-shopping"
+          >
+            ← Continue Shopping
+          </Link>
+
+        </aside>
+
+      </div>
 
     </div>
   );

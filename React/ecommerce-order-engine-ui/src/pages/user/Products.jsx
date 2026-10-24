@@ -12,17 +12,25 @@ import {
   useCart,
 } from "../../context/CartContext";
 
+
 function Products() {
 
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
+
+  const [message, setMessage] =
+    useState("");
+
 
   const {
-  addToCart,
-} = useCart();
+    addToCart,
+  } = useCart();
 
 
   async function loadProducts() {
@@ -30,7 +38,6 @@ function Products() {
     try {
 
       setError("");
-
 
       const productData =
         await getProducts();
@@ -46,7 +53,6 @@ function Products() {
                 await getStock(
                   product.id
                 );
-
 
               return {
                 ...product,
@@ -82,7 +88,21 @@ function Products() {
   }, []);
 
 
+  function handleAddToCart(product) {
 
+    addToCart(product);
+
+    setMessage(
+      `${product.name} added to cart`
+    );
+
+
+    setTimeout(() => {
+
+      setMessage("");
+
+    }, 2000);
+  }
 
 
   if (loading) {
@@ -97,11 +117,39 @@ function Products() {
 
     <div>
 
-      <h1>Products</h1>
+      <div className="products-header">
+
+        <div>
+
+          <h1 className="page-title">
+            Products
+          </h1>
+
+          <p>
+            Browse our available products
+            and add them to your cart.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      {message && (
+
+        <div className="success-message">
+          {message}
+        </div>
+
+      )}
 
 
       {error && (
-        <p>{error}</p>
+
+        <div className="error-message">
+          {error}
+        </div>
+
       )}
 
 
@@ -113,52 +161,93 @@ function Products() {
 
       ) : (
 
-        <div>
+        <div className="product-grid">
 
           {products.map(
             (product) => (
 
               <div
+                className="product-card"
                 key={product.id}
               >
+
+                    <div className="product-card-top">
+
+                    <span className="product-category">
+                        {product.category}
+                    </span>
+
+                    </div>
+
+
+                    <div
+                    className={
+                        product.quantity > 0
+                        ? "product-stock-status in-stock-status"
+                        : "product-stock-status out-stock-status"
+                    }
+                    >
+
+                    <span className="stock-dot"></span>
+
+                    {product.quantity > 0
+                        ? "In Stock"
+                        : "Out of Stock"}
+
+                    </div>
+
+
+                <div className="product-placeholder">
+                  🛍️
+                </div>
+
 
                 <h2>
                   {product.name}
                 </h2>
 
 
-                <p>
-                  Category:{" "}
-                  {product.category}
+                <p className="product-id">
+                  Product ID: {product.id}
                 </p>
 
 
-                <p>
-                  Price: ₹
-                  {product.price}
+                <p className="product-price">
+                  ₹{product.price}
                 </p>
 
 
-                <p>
+                <p
+                  className={
+                    product.quantity > 0
+                      ? "in-stock"
+                      : "out-of-stock"
+                  }
+                >
 
                   {product.quantity > 0
-                    ? `In Stock: ${product.quantity}`
-                    : "Out of Stock"}
+                    ? `${product.quantity} available`
+                    : "Currently unavailable"}
 
                 </p>
 
 
                 <button
+                  className="primary-button product-button"
                   disabled={
                     product.quantity === 0
                   }
                   onClick={() =>
-                    addToCart(
+                    handleAddToCart(
                       product
                     )
                   }
                 >
-                  Add to Cart
+
+                  {product.quantity > 0
+                    ? "Add to Cart"
+                    : "Out of Stock"}
+
                 </button>
 
               </div>
