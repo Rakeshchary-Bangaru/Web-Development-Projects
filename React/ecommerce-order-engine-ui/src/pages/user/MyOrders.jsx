@@ -1,87 +1,89 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import {
-  getOrders,
+  getMyOrders,
 } from "../../services/orderApi";
 
 
 function MyOrders() {
 
-  const [customerId, setCustomerId] =
-    useState("");
-
   const [orders, setOrders] =
     useState([]);
 
-  const [searched, setSearched] =
-    useState(false);
-
   const [loading, setLoading] =
-    useState(false);
+    useState(true);
 
   const [error, setError] =
     useState("");
 
 
-  async function handleSearch(event) {
+  /*
+   * =========================================================
+   * LOAD AUTHENTICATED CUSTOMER ORDERS
+   * ---------------------------------------------------------
+   * No customerId is requested from the user.
+   *
+   * The backend resolves ownership using:
+   *
+   * JWT userId
+   *    ↓
+   * linked Customer
+   *    ↓
+   * customer's orders
+   * =========================================================
+   */
+  useEffect(() => {
 
-    event.preventDefault();
+    async function loadOrders() {
 
-    setError("");
-    setSearched(false);
+      try {
 
-
-    const id = Number(customerId);
-
-
-    if (
-      Number.isNaN(id) ||
-      id <= 0
-    ) {
-
-      setError(
-        "Please enter a valid customer ID"
-      );
-
-      return;
-    }
-
-
-    try {
-
-      setLoading(true);
-
-      const allOrders =
-        await getOrders();
+        setLoading(true);
+        setError("");
 
 
-      const customerOrders =
-        allOrders
-          .filter(
-            (order) =>
-              order.customerId === id
-          )
-          .sort(
+        const customerOrders =
+          await getMyOrders();
+
+
+        /*
+         * Backend already returns newest orders first,
+         * but keeping the frontend sort makes the UI
+         * defensive if ordering changes later.
+         */
+        const sortedOrders =
+          [...customerOrders].sort(
             (a, b) =>
               new Date(b.createdAt) -
               new Date(a.createdAt)
           );
 
 
-      setOrders(customerOrders);
+        setOrders(
+          sortedOrders
+        );
 
-      setSearched(true);
+      } catch (error) {
 
-    } catch (error) {
+        setError(
+          error.message ||
+          "Failed to load your orders"
+        );
 
-      setError(error.message);
+      } finally {
 
-    } finally {
+        setLoading(false);
 
-      setLoading(false);
-
+      }
     }
-  }
+
+
+    loadOrders();
+
+  }, []);
 
 
   function formatDate(date) {
@@ -90,8 +92,37 @@ function MyOrders() {
       return "";
     }
 
+
     return new Date(date)
       .toLocaleString();
+  }
+
+
+  /*
+   * =========================================================
+   * LOADING STATE
+   * =========================================================
+   */
+  if (loading) {
+
+    return (
+
+      <div>
+
+        <div className="orders-header">
+
+          <h1>
+            My Orders
+          </h1>
+
+          <p>
+            Loading your orders...
+          </p>
+
+        </div>
+
+      </div>
+    );
   }
 
 
@@ -113,48 +144,6 @@ function MyOrders() {
       </div>
 
 
-      <form
-        className="orders-search-form"
-        onSubmit={handleSearch}
-      >
-
-        <div>
-
-          <label htmlFor="customerId">
-            Customer ID
-          </label>
-
-          <input
-            id="customerId"
-            type="number"
-            value={customerId}
-            onChange={(event) =>
-              setCustomerId(
-                event.target.value
-              )
-            }
-            placeholder="Enter your customer ID"
-            required
-          />
-
-        </div>
-
-
-        <button
-          className="primary-button"
-          type="submit"
-          disabled={loading}
-        >
-
-          {loading
-            ? "Loading..."
-            : "View Orders"}
-
-        </button>
-
-      </form>
-
-
       {error && (
 
         <div className="error-message">
@@ -164,7 +153,7 @@ function MyOrders() {
       )}
 
 
-      {searched &&
+      {!error &&
         orders.length === 0 && (
 
           <div className="no-orders">
@@ -178,8 +167,7 @@ function MyOrders() {
             </h2>
 
             <p>
-              We couldn't find any orders
-              for this customer.
+              You have not placed any orders yet.
             </p>
 
           </div>
@@ -221,7 +209,8 @@ function MyOrders() {
                   }
                 >
 
-                  <span className="status-dot"></span>
+                  <span className="status-dot">
+                  </span>
 
                   {order.status}
 

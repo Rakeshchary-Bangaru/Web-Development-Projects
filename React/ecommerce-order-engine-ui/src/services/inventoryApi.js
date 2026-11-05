@@ -1,20 +1,57 @@
+import {
+  authenticatedFetch,
+} from "./apiClient";
+
+
 const BASE_URL = "/api/inventory";
 
 
-export async function getStock(productId) {
+export async function getAvailability(
+  productId
+) {
 
   const response = await fetch(
-    `${BASE_URL}/${productId}`
+    `${BASE_URL}/${productId}/availability`
   );
+
 
   if (!response.ok) {
 
-    const message = await response.text();
+    const message =
+      await response.text();
 
     throw new Error(
-      message || "Failed to fetch stock"
+      message ||
+      "Failed to fetch product availability"
     );
   }
+
+
+  return response.json();
+}
+
+
+export async function getStock(
+  productId
+) {
+
+  const response =
+    await authenticatedFetch(
+      `${BASE_URL}/${productId}`
+    );
+
+
+  if (!response.ok) {
+
+    const message =
+      await response.text();
+
+    throw new Error(
+      message ||
+      "Failed to fetch stock"
+    );
+  }
+
 
   return response.json();
 }
@@ -25,28 +62,32 @@ export async function setStock(
   quantity
 ) {
 
-  const response = await fetch(
-    `${BASE_URL}/${productId}`,
-    {
-      method: "PUT",
+  const response =
+    await authenticatedFetch(
+      `${BASE_URL}/${productId}`,
+      {
+        method: "PUT",
 
-      headers: {
-        "Content-Type": "application/json",
-      },
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
 
-      body: JSON.stringify({
-        quantity: quantity,
-      }),
-    }
-  );
+        body: JSON.stringify({
+          quantity,
+        }),
+      }
+    );
 
 
   if (!response.ok) {
 
-    const message = await response.text();
+    const message =
+      await response.text();
 
     throw new Error(
-      message || "Failed to set stock"
+      message ||
+      "Failed to set stock"
     );
   }
 
@@ -60,28 +101,32 @@ export async function addStock(
   quantity
 ) {
 
-  const response = await fetch(
-    `${BASE_URL}/${productId}/add`,
-    {
-      method: "POST",
+  const response =
+    await authenticatedFetch(
+      `${BASE_URL}/${productId}/add`,
+      {
+        method: "POST",
 
-      headers: {
-        "Content-Type": "application/json",
-      },
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
 
-      body: JSON.stringify({
-        quantity: quantity,
-      }),
-    }
-  );
+        body: JSON.stringify({
+          quantity,
+        }),
+      }
+    );
 
 
   if (!response.ok) {
 
-    const message = await response.text();
+    const message =
+      await response.text();
 
     throw new Error(
-      message || "Failed to add stock"
+      message ||
+      "Failed to add stock"
     );
   }
 

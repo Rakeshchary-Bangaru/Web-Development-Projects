@@ -18,8 +18,17 @@ function Checkout() {
   } = useCart();
 
 
-  const [customerId, setCustomerId] =
-    useState("");
+  /*
+   * V7 SECURITY:
+   *
+   * customerId is intentionally NOT stored in frontend state.
+   *
+   * The backend identifies the customer from the authenticated
+   * JWT access token.
+   *
+   * This prevents a customer from changing a customer ID in
+   * DevTools and attempting to place an order for another user.
+   */
 
   const [paymentType, setPaymentType] =
     useState("CARD");
@@ -34,6 +43,9 @@ function Checkout() {
     useState(null);
 
 
+  /*
+   * Calculate the current cart total for display.
+   */
   const total =
     cartItems.reduce(
       (sum, item) =>
@@ -44,6 +56,22 @@ function Checkout() {
     );
 
 
+  /*
+   * =========================================================
+   * CHECKOUT
+   * =========================================================
+   *
+   * The request contains:
+   *
+   * - orderId
+   * - paymentType
+   * - items
+   *
+   * It deliberately does NOT contain customerId.
+   *
+   * Customer identity is resolved by the Spring Boot backend
+   * from the JWT userId claim.
+   */
   async function handleCheckout(event) {
 
     event.preventDefault();
@@ -61,28 +89,9 @@ function Checkout() {
     }
 
 
-    const id =
-      Number(customerId);
-
-
-    if (
-      Number.isNaN(id) ||
-      id <= 0
-    ) {
-
-      setError(
-        "Please enter a valid customer ID"
-      );
-
-      return;
-    }
-
-
     const checkoutRequest = {
 
       orderId: Date.now(),
-
-      customerId: id,
 
       paymentType: paymentType,
 
@@ -99,18 +108,29 @@ function Checkout() {
 
       setLoading(true);
 
+
       const order =
         await checkout(
           checkoutRequest
         );
 
-      setCompletedOrder(order);
 
+      setCompletedOrder(
+        order
+      );
+
+
+      /*
+       * Only clear the cart after the backend confirms
+       * that checkout completed successfully.
+       */
       clearCart();
 
     } catch (error) {
 
-      setError(error.message);
+      setError(
+        error.message
+      );
 
     } finally {
 
@@ -120,6 +140,11 @@ function Checkout() {
   }
 
 
+  /*
+   * =========================================================
+   * SUCCESS VIEW
+   * =========================================================
+   */
   if (completedOrder) {
 
     return (
@@ -143,38 +168,67 @@ function Checkout() {
         <div className="success-order-card">
 
           <div>
-            <span>Order ID</span>
+
+            <span>
+              Order ID
+            </span>
+
             <strong>
               {completedOrder.id}
             </strong>
+
           </div>
 
+
           <div>
-            <span>Customer</span>
+
+            <span>
+              Customer
+            </span>
+
             <strong>
               {completedOrder.customerName}
             </strong>
+
           </div>
 
+
           <div>
-            <span>Payment</span>
+
+            <span>
+              Payment
+            </span>
+
             <strong>
               {completedOrder.paymentType}
             </strong>
+
           </div>
 
+
           <div>
-            <span>Status</span>
+
+            <span>
+              Status
+            </span>
+
             <strong className="paid-status">
               {completedOrder.status}
             </strong>
+
           </div>
 
+
           <div>
-            <span>Total</span>
+
+            <span>
+              Total
+            </span>
+
             <strong>
               ₹{completedOrder.total}
             </strong>
+
           </div>
 
         </div>
@@ -206,6 +260,11 @@ function Checkout() {
   }
 
 
+  /*
+   * =========================================================
+   * EMPTY CART VIEW
+   * =========================================================
+   */
   if (cartItems.length === 0) {
 
     return (
@@ -225,6 +284,7 @@ function Checkout() {
           to checkout.
         </p>
 
+
         <Link to="/shop/products">
 
           <button className="primary-button">
@@ -238,6 +298,11 @@ function Checkout() {
   }
 
 
+  /*
+   * =========================================================
+   * CHECKOUT PAGE
+   * =========================================================
+   */
   return (
 
     <div>
@@ -258,10 +323,15 @@ function Checkout() {
 
       <div className="checkout-layout">
 
+
+        {/* ===================================================
+            CHECKOUT FORM
+            =================================================== */}
+
         <div className="checkout-form-section">
 
           <h2>
-            Customer Details
+            Payment Details
           </h2>
 
 
@@ -270,26 +340,12 @@ function Checkout() {
             onSubmit={handleCheckout}
           >
 
-            <div>
-
-              <label htmlFor="customerId">
-                Customer ID
-              </label>
-
-              <input
-                id="customerId"
-                type="number"
-                value={customerId}
-                onChange={(event) =>
-                  setCustomerId(
-                    event.target.value
-                  )
-                }
-                placeholder="Enter customer ID"
-                required
-              />
-
-            </div>
+            {/*
+             * Customer ID field was intentionally removed.
+             *
+             * The logged-in customer's identity comes from
+             * the JWT access token.
+             */}
 
 
             <div>
@@ -297,6 +353,7 @@ function Checkout() {
               <label htmlFor="paymentType">
                 Payment Method
               </label>
+
 
               <select
                 id="paymentType"
@@ -340,9 +397,11 @@ function Checkout() {
               disabled={loading}
             >
 
-              {loading
-                ? "Processing..."
-                : "Place Order"}
+              {
+                loading
+                  ? "Processing..."
+                  : "Place Order"
+              }
 
             </button>
 
@@ -350,6 +409,10 @@ function Checkout() {
 
         </div>
 
+
+        {/* ===================================================
+            ORDER SUMMARY
+            =================================================== */}
 
         <aside className="checkout-summary">
 

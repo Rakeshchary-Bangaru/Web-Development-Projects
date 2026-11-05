@@ -1,0 +1,436 @@
+
+/* =========================================================
+   ECOMMERCE ORDER ENGINE V11
+   MODERN LOGIN PAGE
+   ========================================================= */
+
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 20px;
+  box-sizing: border-box;
+
+  background:
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(96, 165, 250, 0.18),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(129, 140, 248, 0.16),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #f8fbff 0%,
+      #f1f5ff 50%,
+      #f8f7ff 100%
+    );
+
+  font-family: inherit;
+}
+
+/* Login card */
+
+.login-page .admin-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 42px 38px;
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  border-radius: 22px;
+
+  box-shadow:
+    0 24px 70px rgba(35, 58, 110, 0.09),
+    0 6px 18px rgba(35, 58, 110, 0.04);
+
+  text-align: left;
+  animation: loginCardEnter 0.35s ease-out;
+}
+
+/* Heading */
+
+.login-page .admin-card > h1 {
+  margin: 0 0 10px;
+  color: #0f172a;
+  font-size: clamp(26px, 4vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.9px;
+  line-height: 1.2;
+}
+
+.login-page .admin-card > p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0 0 30px;
+}
+
+/* Form */
+
+.login-page .checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.login-page .checkout-form > div {
+  width: 100%;
+  min-width: 0;
+}
+
+.login-page .checkout-form label {
+  display: block;
+  margin-bottom: 8px;
+
+  color: #334155;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+/* Inputs */
+
+.login-page .checkout-form input {
+  display: block;
+  width: 100%;
+  height: 48px;
+  padding: 0 15px;
+  box-sizing: border-box;
+
+  background: #f8faff;
+  color: #0f172a;
+
+  border: 1.5px solid #e2e8f0;
+  border-radius: 11px;
+
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-page .checkout-form input::placeholder {
+  color: #94a3b8;
+}
+
+.login-page .checkout-form input:hover {
+  border-color: #cbd5e1;
+}
+
+.login-page .checkout-form input:focus {
+  background: #ffffff;
+  border-color: #5267f7;
+  box-shadow: 0 0 0 4px rgba(82, 103, 247, 0.12);
+}
+
+.login-page .checkout-form input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Primary Sign In button */
+
+.login-page .checkout-form .primary-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 49px;
+  margin-top: 8px;
+  padding: 12px 18px;
+
+  border: none;
+  border-radius: 11px;
+
+  background: linear-gradient(
+    100deg,
+    #2563eb 0%,
+    #4f46e5 100%
+  );
+
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.17);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.login-page .checkout-form .primary-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.25);
+}
+
+.login-page .checkout-form .primary-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-page .checkout-form .primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error and success notifications */
+
+.login-page .error-message {
+  padding: 12px 14px;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.login-page .success-message {
+  padding: 12px 14px;
+  margin-bottom: 20px;
+
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.login-page .login-redirect-message {
+  padding: 13px 14px;
+  margin: 0 0 20px;
+
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+
+  color: #1d4ed8;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Create Account footer */
+
+.login-page .auth-footer {
+  margin-top: 24px;
+  padding-top: 20px;
+
+  border-top: 1px solid #edf1f7;
+
+  text-align: center;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.login-page .auth-footer a {
+  color: #2563eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-page .auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Google OAuth button — shown only when enabled */
+
+.login-page .google-login-section {
+  margin-top: 23px;
+}
+
+.login-page .login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.login-page .login-divider::before,
+.login-page .login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.login-page .google-login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 16px;
+
+  background: #ffffff;
+  color: #334155;
+
+  border: 1.5px solid #e2e8f0;
+  border-radius: 11px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.login-page .google-login-button:hover:not(:disabled) {
+  background: #f8faff;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.login-page .google-login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Guest shopping section */
+
+.login-page .guest-shopping-section {
+  margin-top: 26px !important;
+  padding-top: 22px !important;
+
+  border-top: 1px solid #edf1f7 !important;
+  text-align: center;
+}
+
+.login-page .guest-shopping-section > p:first-child {
+  margin: 0 0 14px !important;
+
+  color: #475569;
+  font-size: 13px !important;
+  line-height: 1.5;
+}
+
+.login-page .guest-shopping-button {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 47px;
+  box-sizing: border-box;
+
+  padding: 11px 16px !important;
+
+  background: #eff4ff !important;
+  color: #1e40af !important;
+
+  border: 1.5px solid #dbeafe !important;
+  border-radius: 11px !important;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.login-page .guest-shopping-button:hover {
+  background: #dbeafe !important;
+  border-color: #93c5fd !important;
+  transform: translateY(-1px);
+}
+
+.login-page .guest-shopping-button:focus-visible,
+.login-page .auth-footer a:focus-visible,
+.login-page .google-login-button:focus-visible,
+.login-page .primary-button:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.login-page .guest-shopping-section > p:last-child {
+  margin: 13px 0 0 !important;
+
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+  line-height: 1.5;
+}
+
+/* Entrance animation */
+
+@keyframes loginCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsiveness */
+
+@media (max-width: 600px) {
+  .login-page {
+    padding: 24px 16px;
+    align-items: center;
+  }
+
+  .login-page .admin-card {
+    padding: 30px 23px;
+    border-radius: 18px;
+  }
+
+  .login-page .admin-card > h1 {
+    font-size: 27px;
+  }
+
+  .login-page .checkout-form {
+    gap: 16px;
+  }
+}
+
+/* Reduced-motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page .admin-card {
+    animation: none;
+  }
+
+  .login-page *,
+  .login-page *::before,
+  .login-page *::after {
+    transition: none !important;
+  }
+}

@@ -8,10 +8,23 @@ import {
 
 import {
   getProducts,
+  getSellerProducts,
 } from "../../services/productApi";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
 
 
 function AdminInventory() {
+
+  const {
+    currentUser,
+  } = useAuth();
+
+  const isSeller =
+    currentUser?.role === "SELLER_ADMIN";
+
 
   const [inventory, setInventory] =
     useState([]);
@@ -31,9 +44,13 @@ function AdminInventory() {
     try {
 
       setError("");
+      setLoading(true);
+
 
       const products =
-        await getProducts();
+        isSeller
+          ? await getSellerProducts()
+          : await getProducts();
 
 
       const inventoryData =
@@ -86,9 +103,11 @@ function AdminInventory() {
 
   useEffect(() => {
 
-    loadInventory();
+    if (currentUser) {
+      loadInventory();
+    }
 
-  }, []);
+  }, [currentUser]);
 
 
   async function handleSetStock(item) {
@@ -220,23 +239,22 @@ function AdminInventory() {
 
     <div>
 
-      {/* PAGE HEADER */}
-
       <div className="admin-page-header">
 
         <h1>
-          Inventory
+          {isSeller
+            ? "My Inventory"
+            : "Inventory"}
         </h1>
 
         <p>
-          Monitor stock levels and
-          update product inventory.
+          {isSeller
+            ? "Monitor and update inventory for your products."
+            : "Monitor stock levels and update product inventory."}
         </p>
 
       </div>
 
-
-      {/* SUCCESS */}
 
       {message && (
 
@@ -247,8 +265,6 @@ function AdminInventory() {
       )}
 
 
-      {/* ERROR */}
-
       {error && (
 
         <div className="error-message">
@@ -257,8 +273,6 @@ function AdminInventory() {
 
       )}
 
-
-      {/* INVENTORY SUMMARY */}
 
       <div className="inventory-summary">
 
@@ -287,7 +301,6 @@ function AdminInventory() {
               (total, item) =>
                 total +
                 Number(item.quantity),
-
               0
             )}
 
@@ -318,8 +331,6 @@ function AdminInventory() {
       </div>
 
 
-      {/* INVENTORY TABLE */}
-
       <div className="admin-card admin-table-card">
 
         <div className="admin-section-header">
@@ -327,12 +338,15 @@ function AdminInventory() {
           <div>
 
             <h2>
-              Inventory List
+              {isSeller
+                ? "My Inventory List"
+                : "Inventory List"}
             </h2>
 
             <p>
-              Current stock availability
-              for all products.
+              {isSeller
+                ? "Current stock levels for your products."
+                : "Current stock availability for all products."}
             </p>
 
           </div>

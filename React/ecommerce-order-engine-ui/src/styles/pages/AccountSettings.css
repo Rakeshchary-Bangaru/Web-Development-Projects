@@ -1,0 +1,261 @@
+
+/* ================================================
+   ACCOUNT SETTINGS — ECOMMERCE ORDER ENGINE V7
+   ================================================ */
+
+.account-settings-page {
+  min-height: calc(100vh - 80px);
+  padding: 64px 24px 90px;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(61, 113, 244, 0.065),
+      transparent 46%
+    ),
+    #f6f8fc;
+  color: #15213a;
+}
+
+.account-settings-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* PAGE HEADER */
+
+.account-settings-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.account-settings-header-icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #2559e8;
+  background: #e7efff;
+  border: 1px solid #dbe6ff;
+  border-radius: 17px;
+}
+
+.account-settings-header h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.7rem, 3vw, 2.15rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  color: #12213b;
+}
+
+.account-settings-header p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+/* SHARED CARD */
+
+.account-settings-card {
+  margin-bottom: 22px;
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #e5eaf2;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(25, 48, 88, 0.045);
+}
+
+.account-settings-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.account-settings-card-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #2559e8;
+  background: #eef3ff;
+  border-radius: 12px;
+}
+
+.account-settings-card-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #18243d;
+}
+
+.account-settings-card-header p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #7a879b;
+}
+
+/* PERSONAL INFORMATION GRID */
+
+.account-settings-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.account-settings-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  padding: 18px;
+  background: #f8faff;
+  border: 1px solid #edf0f8;
+  border-radius: 13px;
+}
+
+.account-settings-info-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #7b879b;
+}
+
+.account-settings-info-value {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: #1b2944;
+  overflow-wrap: anywhere;
+}
+
+/* AUTHENTICATION */
+
+.account-settings-auth-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.account-settings-auth-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.account-settings-auth-label strong {
+  font-size: 0.95rem;
+  color: #1a2842;
+}
+
+.account-settings-auth-label span {
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: #7a879b;
+}
+
+.account-settings-provider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 8px 13px;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2458df;
+  background: #eaf1ff;
+  border: 1px solid #d7e5ff;
+}
+
+.account-settings-note {
+  display: flex;
+  gap: 11px;
+  padding: 16px;
+  background: #f7f9fd;
+  border: 1px solid #e8edf5;
+  border-radius: 12px;
+  color: #64748b;
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+
+/* BACK LINK */
+
+.account-settings-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+  color: #2559e8;
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.account-settings-back:hover {
+  color: #173fab;
+  text-decoration: underline;
+}
+
+.account-settings-back:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 5px;
+  border-radius: 4px;
+}
+
+/* FEEDBACK STATES */
+
+.account-settings-status {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #e5eaf2;
+  border-radius: 14px;
+  color: #64748b;
+}
+
+.account-settings-error {
+  color: #b91c1c;
+  background: #fff5f5;
+  border-color: #fecaca;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 640px) {
+  .account-settings-page {
+    padding: 32px 16px 60px;
+  }
+
+  .account-settings-header {
+    gap: 13px;
+    margin-bottom: 24px;
+  }
+
+  .account-settings-header-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .account-settings-card {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .account-settings-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-settings-auth-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

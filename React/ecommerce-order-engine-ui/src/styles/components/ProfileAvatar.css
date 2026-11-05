@@ -1,0 +1,240 @@
+/* =========================================================
+   PROFILE AVATAR NAVIGATION
+   ========================================================= */
+
+.profile-avatar-link {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.navigation-profile-avatar {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  letter-spacing: 0.4px;
+
+  cursor: pointer;
+
+  border: 2px solid transparent;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+.profile-avatar-link:hover
+.navigation-profile-avatar {
+
+  transform: translateY(-1px);
+
+  background: #1d4ed8;
+
+  box-shadow:
+    0 4px 12px
+    rgba(37, 99, 235, 0.25);
+}
+
+
+/* =========================================================
+   KEYBOARD ACCESSIBILITY
+   ========================================================= */
+
+.profile-avatar-link:focus-visible {
+  outline: none;
+}
+
+
+.profile-avatar-link:focus-visible
+.navigation-profile-avatar {
+
+  border-color: #93c5fd;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(59, 130, 246, 0.2);
+}
+
+
+.profile-avatar-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.profile-avatar-trigger {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.profile-avatar-trigger:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.profile-account-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 1000;
+  width: min(290px, calc(100vw - 24px));
+  padding: 8px;
+  background: #ffffff;
+  color: #172033;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+}
+
+.profile-menu-header {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  min-width: 0;
+}
+
+.profile-menu-name {
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.profile-menu-email {
+  color: #64748b;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.profile-menu-divider {
+  height: 1px;
+  margin: 6px 0;
+  background: #e2e8f0;
+}
+
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #172033;
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.profile-menu-item:hover,
+.profile-menu-item:focus-visible {
+  background: #f1f5f9;
+}
+
+.profile-menu-logout {
+  color: #dc2626;
+}
+
+.profile-menu-logout:hover,
+.profile-menu-logout:focus-visible {
+  background: #fef2f2;
+}
+
+@media (max-width: 480px) {
+  .profile-account-dropdown {
+    top: calc(100% + 10px);
+  }
+
+  .profile-menu-item {
+    min-height: 44px;
+  }
+}
+
+
+/* ================================================
+   ADMIN CONTENT AND ACCOUNT TOPBAR
+   ================================================ */
+
+.admin-content {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-topbar {
+  min-height: 76px;
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5eaf2;
+  position: relative;
+  z-index: 20;
+}
+
+.admin-topbar-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #18243d;
+  letter-spacing: -0.02em;
+}
+
+.admin-topbar .profile-avatar-container {
+  margin-left: auto;
+}
+
+/* Retain your existing .admin-main padding and
+   background rules. Do not override them here. */
+
+@media (max-width: 768px) {
+  .admin-topbar {
+    min-height: 64px;
+    padding: 12px 18px;
+  }
+
+  .admin-topbar-title {
+    font-size: 1rem;
+  }
+}

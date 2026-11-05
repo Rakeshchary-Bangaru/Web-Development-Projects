@@ -1,384 +1,266 @@
+
 import { useEffect, useState } from "react";
 
 import {
   getProducts,
+  getSellerProducts,
   createProduct,
   updateProduct,
   updateProductPrice,
   deleteProduct,
 } from "../../services/productApi";
 
+import { useAuth } from "../../context/AuthContext";
+
+import ProductImageManager from "../../components/ProductImageManager";
+
+const EMPTY_FORM = {
+  name: "",
+  category: "",
+  price: "",
+};
 
 function AdminProducts() {
-
   const [products, setProducts] = useState([]);
+  const [form, setForm] = useState(EMPTY_FORM);
 
-  const [form, setForm] = useState({
-    id: "",
-    name: "",
-    category: "",
-    price: "",
-  });
-
-  const [editingId, setEditingId] =
+  const [editingId, setEditingId] = useState(null);
+  const [selectedImageProduct, setSelectedImageProduct] =
     useState(null);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  const [error, setError] =
-    useState("");
+  const { currentUser, accessToken } = useAuth();
 
-  const [message, setMessage] =
-    useState("");
+  const isSeller =
+    currentUser?.role === "SELLER_ADMIN";
 
+  const canManageImages =
+    currentUser?.role === "ROOT" ||
+    currentUser?.role === "SELLER_ADMIN";
+
+  /*
+   * Prefer a token supplied by AuthContext.
+   *
+   * Local/session storage fallbacks are included for
+   * frontends that already store their JWT there.
+   *
+   * Match this to your actual AuthContext implementation.
+   */
+  const token =
+    accessToken ||
+    currentUser?.accessToken ||
+    localStorage.getItem("accessToken") ||
+    sessionStorage.getItem("accessToken");
 
   async function loadProducts() {
-
     try {
-
       setError("");
 
-      const data =
-        await getProducts();
+      const data = isSeller
+        ? await getSellerProducts()
+        : await getProducts();
 
       setProducts(data);
-
-    } catch (error) {
-
-      setError(error.message);
-
+    } catch (err) {
+      setError(err.message);
     } finally {
-
       setLoading(false);
-
     }
   }
 
-
   useEffect(() => {
-
-    loadProducts();
-
-  }, []);
-
+    if (currentUser) {
+      loadProducts();
+    }
+  }, [currentUser, isSeller]);
 
   function handleChange(event) {
+    const { name, value } = event.target;
 
-    const {
-      name,
-      value,
-    } = event.target;
-
-
-    setForm(
-      (previousForm) => ({
-        ...previousForm,
-        [name]: value,
-      })
-    );
+    setForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   }
 
-
   async function handleSubmit(event) {
-
     event.preventDefault();
 
     setError("");
     setMessage("");
 
+    const price = Number(form.price);
 
+    if (!Number.isFinite(price) || price <= 0) {
+      setError("Please enter a valid price");
+      return;
+    }
+
+    /*
+     * MySQL generates the product ID automatically.
+     * Do not include an ID in the create request.
+     */
     const product = {
-
-      id:
-        Number(form.id),
-
-      name:
-        form.name,
-
-      category:
-        form.category,
-
-      price:
-        Number(form.price),
+      name: form.name.trim(),
+      category: form.category.trim(),
+      price,
     };
 
+    if (!product.name || !product.category) {
+      setError("Product name and category are required");
+      return;
+    }
 
     try {
-
       if (editingId !== null) {
-
-        await updateProduct(
-          editingId,
-          product
-        );
-
-        setMessage(
-          "Product updated successfully"
-        );
-
+        await updateProduct(editingId, product);
+        setMessage("Product updated successfully");
       } else {
-
-        await createProduct(
-          product
-        );
-
-        setMessage(
-          "Product created successfully"
-        );
+        await createProduct(product);
+        setMessage("Product created successfully");
       }
 
-
       resetForm();
-
       await loadProducts();
-
-    } catch (error) {
-
-      setError(error.message);
-
+    } catch (err) {
+      setError(err.message);
     }
   }
 
-
   function handleEdit(product) {
-
-    setEditingId(
-      product.id
-    );
-
+    setEditingId(product.id);
 
     setForm({
-      id:
-        product.id,
-
-      name:
-        product.name,
-
-      category:
-        product.category,
-
-      price:
-        product.price,
+      name: product.name,
+      category: product.category,
+      price: product.price,
     });
-
 
     setMessage("");
     setError("");
   }
 
-
-  async function handlePriceUpdate(
-    product
-  ) {
-
-    const newPrice =
-      window.prompt(
-        `Enter new price for ${product.name}`,
-        product.price
-      );
-
+  async function handlePriceUpdate(product) {
+    const newPrice = window.prompt(
+      `Enter new price for ${product.name}`,
+      product.price
+    );
 
     if (newPrice === null) {
       return;
     }
 
+    const price = Number(newPrice);
 
-    const price =
-      Number(newPrice);
-
-
-    if (
-      price <= 0 ||
-      Number.isNaN(price)
-    ) {
-
-      setError(
-        "Please enter a valid price"
-      );
-
+    if (!Number.isFinite(price) || price <= 0) {
+      setError("Please enter a valid price");
       return;
     }
 
-
     try {
-
       setError("");
       setMessage("");
 
+      await updateProductPrice(product.id, price);
 
-      await updateProductPrice(
-        product.id,
-        price
-      );
-
-
-      setMessage(
-        "Product price updated successfully"
-      );
-
-
+      setMessage("Product price updated successfully");
       await loadProducts();
-
-    } catch (error) {
-
-      setError(error.message);
-
+    } catch (err) {
+      setError(err.message);
     }
   }
 
-
   async function handleDelete(id) {
-
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to delete this product?"
-      );
-
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
 
     if (!confirmed) {
       return;
     }
 
-
     try {
-
       setError("");
       setMessage("");
 
-
       await deleteProduct(id);
 
+      if (selectedImageProduct?.id === id) {
+        setSelectedImageProduct(null);
+      }
 
-      setMessage(
-        "Product deleted successfully"
-      );
-
-
+      setMessage("Product deleted successfully");
       await loadProducts();
-
-    } catch (error) {
-
-      setError(error.message);
-
+    } catch (err) {
+      setError(err.message);
     }
   }
 
-
   function handleCancelEdit() {
-
     resetForm();
-
     setMessage("");
     setError("");
   }
 
-
   function resetForm() {
-
-    setForm({
-      id: "",
-      name: "",
-      category: "",
-      price: "",
-    });
-
+    setForm(EMPTY_FORM);
     setEditingId(null);
   }
 
-
-  if (loading) {
-
-    return (
-      <p>
-        Loading products...
-      </p>
-    );
+  function handleManageImages(product) {
+    setSelectedImageProduct(product);
+    setError("");
+    setMessage("");
   }
 
+  if (loading) {
+    return <p>Loading products...</p>;
+  }
 
   return (
-
     <div>
-
       <div className="admin-page-header">
-
         <h1>
-          Products
+          {isSeller ? "My Products" : "Products"}
         </h1>
 
         <p>
-          Create, edit, update and manage
-          products in the store.
+          {isSeller
+            ? "Create and manage products belonging to your seller account."
+            : "Create, edit, update and manage products in the store."}
         </p>
-
       </div>
 
-
       {message && (
-
         <div className="success-message">
           {message}
         </div>
-
       )}
 
-
       {error && (
-
         <div className="error-message">
           {error}
         </div>
-
       )}
 
-
       <div className="admin-card admin-form-card">
-
         <div className="admin-section-header">
-
           <h2>
-
             {editingId !== null
               ? "Edit Product"
               : "Add Product"}
-
           </h2>
-
         </div>
-
 
         <form
           className="admin-form"
           onSubmit={handleSubmit}
         >
-
           <div className="admin-form-grid">
-
             <div>
-
-              <label htmlFor="id">
-                Product ID
-              </label>
-
-              <input
-                id="id"
-                name="id"
-                type="number"
-                value={form.id}
-                onChange={handleChange}
-                disabled={
-                  editingId !== null
-                }
-                placeholder="Enter product ID"
-                required
-              />
-
-            </div>
-
-
-            <div>
-
               <label htmlFor="name">
                 Product Name
               </label>
@@ -392,12 +274,9 @@ function AdminProducts() {
                 placeholder="Enter product name"
                 required
               />
-
             </div>
 
-
             <div>
-
               <label htmlFor="category">
                 Category
               </label>
@@ -411,12 +290,9 @@ function AdminProducts() {
                 placeholder="Enter category"
                 required
               />
-
             </div>
 
-
             <div>
-
               <label htmlFor="price">
                 Price
               </label>
@@ -425,184 +301,151 @@ function AdminProducts() {
                 id="price"
                 name="price"
                 type="number"
+                min="0.01"
                 step="0.01"
                 value={form.price}
                 onChange={handleChange}
                 placeholder="Enter price"
                 required
               />
-
             </div>
-
           </div>
 
-
           <div className="admin-form-actions">
-
             <button
               className="primary-button"
               type="submit"
             >
-
               {editingId !== null
                 ? "Update Product"
                 : "Add Product"}
-
             </button>
 
-
             {editingId !== null && (
-
               <button
                 className="secondary-button"
                 type="button"
-                onClick={
-                  handleCancelEdit
-                }
+                onClick={handleCancelEdit}
               >
                 Cancel
               </button>
-
             )}
-
           </div>
-
         </form>
-
       </div>
 
-
       <div className="admin-card admin-table-card">
-
         <div className="admin-section-header">
-
           <div>
-
             <h2>
-              Product List
+              {isSeller
+                ? "My Product List"
+                : "Product List"}
             </h2>
 
             <p>
               {products.length} products
               currently available.
             </p>
-
           </div>
-
         </div>
-
 
         <div className="table-container">
-
           <table className="admin-table">
-
             <thead>
-
               <tr>
-
                 <th>ID</th>
-
                 <th>Name</th>
-
                 <th>Category</th>
-
                 <th>Price</th>
-
                 <th>Actions</th>
-
               </tr>
-
             </thead>
 
-
             <tbody>
+              {products.map((product) => (
+                <tr key={product.id}>
+                  <td>{product.id}</td>
 
-              {products.map(
-                (product) => (
+                  <td>
+                    <strong>{product.name}</strong>
+                  </td>
 
-                  <tr key={product.id}>
+                  <td>
+                    <span className="category-badge">
+                      {product.category}
+                    </span>
+                  </td>
 
-                    <td>
-                      {product.id}
-                    </td>
+                  <td className="admin-price">
+                    ₹{product.price}
+                  </td>
 
-                    <td>
-                      <strong>
-                        {product.name}
-                      </strong>
-                    </td>
+                  <td>
+                    <div className="admin-action-buttons">
+                      <button
+                        type="button"
+                        className="admin-edit-button"
+                        onClick={() =>
+                          handleEdit(product)
+                        }
+                      >
+                        Edit
+                      </button>
 
-                    <td>
+                      <button
+                        type="button"
+                        className="admin-price-button"
+                        onClick={() =>
+                          handlePriceUpdate(product)
+                        }
+                      >
+                        Price
+                      </button>
 
-                      <span className="category-badge">
-                        {product.category}
-                      </span>
-
-                    </td>
-
-                    <td className="admin-price">
-                      ₹{product.price}
-                    </td>
-
-                    <td>
-
-                      <div className="admin-action-buttons">
-
+                      {canManageImages && (
                         <button
+                          type="button"
                           className="admin-edit-button"
                           onClick={() =>
-                            handleEdit(
-                              product
-                            )
+                            handleManageImages(product)
                           }
                         >
-                          Edit
+                          Manage Images
                         </button>
+                      )}
 
-
-                        <button
-                          className="admin-price-button"
-                          onClick={() =>
-                            handlePriceUpdate(
-                              product
-                            )
-                          }
-                        >
-                          Price
-                        </button>
-
-
-                        <button
-                          className="admin-delete-button"
-                          onClick={() =>
-                            handleDelete(
-                              product.id
-                            )
-                          }
-                        >
-                          Delete
-                        </button>
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-
-                )
-              )}
-
+                      <button
+                        type="button"
+                        className="admin-delete-button"
+                        onClick={() =>
+                          handleDelete(product.id)
+                        }
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
-
           </table>
-
         </div>
-
       </div>
 
+      {canManageImages && selectedImageProduct && (
+        <ProductImageManager
+          key={selectedImageProduct.id}
+          productId={selectedImageProduct.id}
+          productName={selectedImageProduct.name}
+          token={token}
+          onClose={() =>
+            setSelectedImageProduct(null)
+          }
+        />
+      )}
     </div>
   );
 }
-
 
 export default AdminProducts;

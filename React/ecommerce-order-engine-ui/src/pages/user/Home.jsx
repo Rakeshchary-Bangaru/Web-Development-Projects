@@ -1,95 +1,146 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowRight, ShoppingBag } from "lucide-react";
+
+import { getProducts } from "../../services/productApi";
+import { getAvailability } from "../../services/inventoryApi";
+
+import { useAuth } from "../../context/AuthContext";
+import ProductImage from "../../components/ProductImage";
 
 import {
-  getProducts,
-} from "../../services/productApi";
+  isStorefrontProduct,
+  selectFeaturedProducts,
+} from "../../utils/storefrontProducts";
 
-import {
-  getStock,
-} from "../../services/inventoryApi";
-
+const priceFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 2,
+});
 
 function Home() {
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [featuredProducts, setFeaturedProducts] =
-    useState([]);
+  const {
+    isAuthenticated,
+    loading: authLoading,
+  } = useAuth();
 
-  const [loading, setLoading] =
-    useState(true);
+  /*
+   * =========================================================
+   * SHOPPING PERMISSIONS
+   * =========================================================
+   *
+   * Every authenticated role can shop and view own orders:
+   *
+   * CUSTOMER
+   * ROOT
+   * SELLER_ADMIN
+   * IT_SUPPORT
+   *
+   * Administrative roles do not restrict shopping.
+   */
 
-  const [error, setError] =
-    useState("");
+  const canViewOwnOrders =
+    !authLoading && isAuthenticated;
 
-
-  async function loadFeaturedProducts() {
-
-    try {
-
-      setError("");
-
-      const products =
-        await getProducts();
-
-      const firstProducts =
-        products.slice(0, 3);
-
-
-      const productsWithStock =
-        await Promise.all(
-
-          firstProducts.map(
-            async (product) => {
-
-              const stock =
-                await getStock(
-                  product.id
-                );
-
-              return {
-                ...product,
-                quantity: stock.quantity,
-              };
-
-            }
-          )
-
-        );
-
-
-      setFeaturedProducts(
-        productsWithStock
-      );
-
-    } catch (error) {
-
-      setError(error.message);
-
-    } finally {
-
-      setLoading(false);
-
-    }
-  }
-
+  /*
+   * =========================================================
+   * LOAD FEATURED PRODUCTS
+   * =========================================================
+   */
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadFeaturedProducts() {
+      try {
+        setLoading(true);
+        setError("");
+
+        // Fetch public products from Spring Boot.
+        const products = await getProducts();
+
+        // Exclude known development and test products.
+        const publicProducts =
+          products.filter(isStorefrontProduct);
+
+        // Fetch public stock availability.
+        // Exact inventory quantities remain private.
+        const productsWithAvailability =
+          await Promise.all(
+            publicProducts.map(async (product) => {
+              try {
+                const availability =
+                  await getAvailability(product.id);
+
+                return {
+                  ...product,
+                  inStock: availability.inStock,
+                  availability:
+                    availability.availability,
+                };
+              } catch {
+                // Never assume stock exists if
+                // the availability request fails.
+                return {
+                  ...product,
+                  inStock: false,
+                  availability: "UNAVAILABLE",
+                };
+              }
+            })
+          );
+
+        // Select up to six featured products.
+        const selectedProducts =
+          selectFeaturedProducts(
+            productsWithAvailability,
+            6
+          );
+
+        if (!cancelled) {
+          setFeaturedProducts(selectedProducts);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err.message ||
+              "Unable to load featured products"
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
 
     loadFeaturedProducts();
 
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
+  /*
+   * =========================================================
+   * HOMEPAGE
+   * =========================================================
+   */
 
   return (
-
     <div>
-
+      {/* ============================================= */}
       {/* HERO SECTION */}
+      {/* ============================================= */}
 
       <section className="hero">
-
         <div className="hero-content">
-
           <p className="hero-label">
             SIMPLE. FAST. RELIABLE.
           </p>
@@ -106,66 +157,63 @@ function Home() {
             shopping experience.
           </p>
 
-
           <div className="hero-actions">
+            {/* SHOP NOW: EVERYONE */}
 
-            <Link to="/shop/products">
+            <Link
+              to="/shop/products"
+              className="hero-shop-button"
+            >
+              <span>Shop Now</span>
 
-              <button className="primary-button">
-                Shop Now
-              </button>
-
+              <ArrowRight
+                size={19}
+                strokeWidth={2.3}
+                aria-hidden="true"
+              />
             </Link>
 
+            {/* MY ORDERS: ALL AUTHENTICATED ROLES */}
 
-            <Link to="/shop/orders">
-
-              <button className="secondary-button">
+            {canViewOwnOrders && (
+              <Link
+                to="/shop/orders"
+                className="hero-orders-button"
+              >
                 My Orders
-              </button>
-
-            </Link>
-
+              </Link>
+            )}
           </div>
-
         </div>
-
       </section>
 
-
-      {/* FEATURES */}
+      {/* ============================================= */}
+      {/* SHOP FEATURES */}
+      {/* ============================================= */}
 
       <section className="section">
-
         <div className="section-header">
-
-          <h2>
-            Shop With Us
-          </h2>
+          <h2>Shop With Us</h2>
 
           <p>
             Everything you need for a
             simple shopping experience.
           </p>
-
         </div>
 
-
         <div className="feature-grid">
+          {/* BROWSE PRODUCTS */}
 
           <div className="feature-card">
-
             <div className="feature-icon">
               🛍️
             </div>
 
-            <h3>
-              Browse Products
-            </h3>
+            <h3>Browse Products</h3>
 
             <p>
               Explore our product catalogue,
-              prices and live stock availability.
+              prices and live availability.
             </p>
 
             <Link
@@ -174,19 +222,16 @@ function Home() {
             >
               View Products →
             </Link>
-
           </div>
 
+          {/* SHOPPING CART */}
 
           <div className="feature-card">
-
             <div className="feature-icon">
               🛒
             </div>
 
-            <h3>
-              Shopping Cart
-            </h3>
+            <h3>Shopping Cart</h3>
 
             <p>
               Add your favourite products
@@ -200,19 +245,16 @@ function Home() {
             >
               View Cart →
             </Link>
-
           </div>
 
+          {/* TRACK OWN ORDERS */}
 
           <div className="feature-card">
-
             <div className="feature-icon">
               📦
             </div>
 
-            <h3>
-              Track Orders
-            </h3>
+            <h3>Track Orders</h3>
 
             <p>
               View your previous purchases,
@@ -221,142 +263,174 @@ function Home() {
             </p>
 
             <Link
-              to="/shop/orders"
+              to={
+                canViewOwnOrders
+                  ? "/shop/orders"
+                  : "/login"
+              }
+              state={
+                canViewOwnOrders
+                  ? undefined
+                  : {
+                      from: {
+                        pathname: "/shop/orders",
+                      },
+                    }
+              }
               className="feature-link"
             >
-              My Orders →
+              {canViewOwnOrders
+                ? "My Orders →"
+                : "Sign in to view orders →"}
             </Link>
-
           </div>
-
         </div>
-
       </section>
 
-
+      {/* ============================================= */}
       {/* FEATURED PRODUCTS */}
+      {/* ============================================= */}
 
       <section className="section">
-
         <div className="section-header">
-
-          <h2>
-            Featured Products
-          </h2>
+          <h2>Featured Products</h2>
 
           <p>
-            A few products currently
-            available in our store.
+            Explore popular products from
+            different categories in our store.
           </p>
-
         </div>
 
+        {/* LOADING */}
 
         {loading && (
-          <p>
-            Loading products...
-          </p>
+          <p>Loading featured products...</p>
         )}
 
+        {/* ERROR */}
 
         {error && (
-          <p className="error-message">
+          <p
+            className="error-message"
+            role="alert"
+          >
             {error}
           </p>
         )}
 
+        {/* EMPTY STATE */}
 
         {!loading &&
           !error &&
           featuredProducts.length === 0 && (
-
-            <p>
-              No products available.
-            </p>
-
+            <p>No featured products available.</p>
           )}
 
-
-        <div className="product-grid">
-
-          {featuredProducts.map(
-            (product) => (
-
-              <div
-                className="product-card"
-                key={product.id}
-              >
-
-                <p className="product-category">
-                  {product.category}
-                </p>
-
-
-                <h3>
-                  {product.name}
-                </h3>
-
-
-                <p className="product-price">
-                  ₹{product.price}
-                </p>
-
-
-                <p
-                  className={
-                    product.quantity > 0
-                      ? "in-stock"
-                      : "out-of-stock"
-                  }
-                >
-
-                  {product.quantity > 0
-                    ? `${product.quantity} in stock`
-                    : "Out of stock"}
-
-                </p>
-
-
-                <Link
-                  to="/shop/products"
-                >
-
-                  <button className="primary-button product-button">
-                    View Product
-                  </button>
-
-                </Link>
-
-              </div>
-
-            )
-          )}
-
-        </div>
-
+        {/* FEATURED PRODUCT CARDS */}
 
         {!loading &&
+          !error &&
           featuredProducts.length > 0 && (
+            <div className="product-grid">
+              {featuredProducts.map((product) => (
+                <div
+                  className="product-card"
+                  key={product.id}
+                >
+                  {/* PRODUCT IMAGE */}
 
-            <div className="view-all-container">
+                  <div className="product-image-panel">
+                    <ProductImage
+                      productId={product.id}
+                      productName={product.name}
+                    />
+                  </div>
 
-              <Link to="/shop/products">
+                  {/* CATEGORY */}
 
-                <button className="secondary-button">
-                  View All Products
-                </button>
+                  <p className="product-category">
+                    {product.category}
+                  </p>
 
-              </Link>
+                  {/* PRODUCT NAME */}
 
+                  <h3>{product.name}</h3>
+
+                  {/* BRAND */}
+
+                  {product.brand && (
+                    <p className="product-brand">
+                      {product.brand}
+                    </p>
+                  )}
+
+                  {/* PRICE */}
+
+                  <p className="product-price">
+                    {priceFormatter.format(
+                      Number(product.price)
+                    )}
+                  </p>
+
+                  {/* AVAILABILITY */}
+
+                  <p
+                    className={
+                      product.inStock
+                        ? "in-stock"
+                        : "out-of-stock"
+                    }
+                  >
+                    {product.inStock
+                      ? "In Stock"
+                      : "Out of Stock"}
+                  </p>
+
+                  {/* PRODUCT CATALOGUE LINK */}
+
+                  <Link
+                    to="/shop/products"
+                    className="primary-button product-button"
+                  >
+                    View Products
+                  </Link>
+                </div>
+              ))}
             </div>
-
           )}
 
-      </section>
+        {/* ========================================= */}
+        {/* VIEW ALL PRODUCTS */}
+        {/* ========================================= */}
 
+        {!loading &&
+          !error &&
+          featuredProducts.length > 0 && (
+            <div className="view-all-container">
+              <Link
+                to="/shop/products"
+                className="view-all-products-button"
+              >
+                <ShoppingBag
+                  size={19}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+
+                <span>View All Products</span>
+
+                <ArrowRight
+                  size={19}
+                  strokeWidth={2}
+                  className="view-all-arrow"
+                  aria-hidden="true"
+                />
+              </Link>
+            </div>
+          )}
+      </section>
     </div>
   );
 }
-
 
 export default Home;
